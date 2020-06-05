@@ -30,7 +30,7 @@ void drawSphere( double r, int lats, int longs ) {
 
         glBegin( GL_QUAD_STRIP );
         for ( j = 0; j <= longs; j++ ) {
-            double lng = 2 * M_PI * ( j - 1 ) / longs;
+            double lng = 2 * M_PI * (float)( j - 1 ) / longs;
             double x = cos( lng );
             double y = sin( lng );
 
@@ -42,6 +42,29 @@ void drawSphere( double r, int lats, int longs ) {
         glEnd();
     }
 }
+
+const int LightsPerSphere = 40;
+
+struct LightInfo {
+    glm::vec3 rotationOrigin;
+    glm::vec3 rotationNormal;
+    glm::vec4 color;
+    glm::vec4 position = glm::vec4(0);
+    float speed = glm::linearRand(1, 3)*3e-1f;
+
+    LightInfo()  {
+        rotationOrigin = glm::sphericalRand( 1.1f );
+        rotationNormal = glm::cross( glm::sphericalRand( 1.f ), rotationOrigin );
+        color = glm::vec4( glm::abs( glm::sphericalRand( 1.f ) ), 1 );
+    }
+
+    void update( double time ) {
+        auto rotated = glm::rotate( rotationOrigin, (float)time * speed, rotationNormal );
+        position = glm::vec4( rotated, 1 );
+    }
+};
+
+LightInfo lights[LightsPerSphere];
 
 int main() {
     GLFWwindow* window;
@@ -79,32 +102,38 @@ int main() {
     auto matProj = glm::perspective( glm::radians( 45.0f ), (float)width / height, 0.1f, 100.f );  
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr(matProj) );
+
     glEnable( GL_LIGHTING );
-    glm::vec3 lightRotNormals[8];
-    glm::vec3 lightRotOrigins[8];
-    for ( int light = GL_LIGHT0; light <= GL_LIGHT7; light++ ) {
-        int lightNo = light - GL_LIGHT0;
-        lightRotOrigins[lightNo] = glm::sphericalRand( 1.2f );
-        lightRotNormals[lightNo] = glm::cross( glm::sphericalRand( 1.f ), lightRotOrigins[lightNo] );
-        glEnable( light );
-        glLightf( light, GL_QUADRATIC_ATTENUATION, 2 );
-        glm::vec4 color( glm::abs( glm::sphericalRand( 1.f ) ), 1);
-        glLightfv( light, GL_DIFFUSE, glm::value_ptr( color ) );
-    }
     glClearColor( 0, 0.3f, 0, 0 );
+    glEnable( GL_BLEND );
+    glEnable( GL_CULL_FACE );
+    glm::vec4 ambientLight( 0, 0, 0, 1 );
+    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( ambientLight ) );
 
     while ( !glfwWindowShouldClose( window ) ) {
+        float time = (float) glfwGetTime();
+
         glClear( GL_COLOR_BUFFER_BIT );
 
-        for ( int light = GL_LIGHT0; light <= GL_LIGHT7; light++ ) {
-            int lightNo = light - GL_LIGHT0;
-            float time = (float) glfwGetTime();
-            auto rotated = glm::rotate( lightRotOrigins[lightNo], time * (lightNo + 1) * 1e-1f, lightRotNormals[lightNo] );
-            glm::vec4 pos( rotated, 1 );
-            glLightfv( light, GL_POSITION, glm::value_ptr( pos ) );
+        glBlendFunc( GL_ZERO, GL_ZERO );
+        drawSphere( 1, 99, 99 );
+   
+        glBlendFunc( GL_ONE, GL_ONE );
+        for ( int simLight = 0; simLight < LightsPerSphere;  ) {
+            for ( int light = GL_LIGHT0; light <= GL_LIGHT7; light++, simLight++ ) {
+                if( simLight < LightsPerSphere)
+                    glEnable( light );
+                else
+                    glDisable( light );
+                auto& lightInfo = lights[simLight];
+                lightInfo.update( time );
+                glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position) );
+                glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
+                glLightf( light, GL_QUADRATIC_ATTENUATION, 4 );
+            }
+            drawSphere( 1, 99, 99 );
         }
 
-        drawSphere( 1, 99, 99 );
 
         glfwSwapBuffers( window );
 
