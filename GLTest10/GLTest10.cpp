@@ -104,6 +104,11 @@ int main() {
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        glMatrixMode( GL_MODELVIEW );
+        glPushMatrix();
+        glRotatef( 23, 1, 0, 0 );
+        glRotated( time * 3e1, 0, 1, 0 );
+
         glBlendFunc( GL_ZERO, GL_ZERO );
         Utils::drawSphere( 1, 99 );
    
@@ -122,6 +127,8 @@ int main() {
             }
             Utils::drawSphere( 1, 99 );
         }
+
+        glPopMatrix();
 
         glfwSwapBuffers( window );
 
