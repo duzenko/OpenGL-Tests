@@ -11,6 +11,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "Simulation.h"
+#include "Image.h"
 
 struct SurfaceVertex {
 	glm::vec3 position;
@@ -62,12 +63,14 @@ struct SphereRenderModel {
         }
     }
 
-    void Render();
+    void Render( float scale = 1 );
 };
 
 struct Renderer {
     SphereRenderModel sphere = { 90 };
 
+    Image textureEarth = { "..\\assets\\2k_earth_daymap.bmp" };
+    Image textureStars = { "..\\assets\\2k_stars_milky_way.bmp" };
 
     Renderer();
     ~Renderer();

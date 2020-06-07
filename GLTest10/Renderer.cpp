@@ -1,13 +1,14 @@
 #include "Renderer.h"
 
 #include "glad.h"
-#include "Image.h"
 
 struct Viewport {
     int x, y, width, height;
 };
 
-void SphereRenderModel::Render() {
+void SphereRenderModel::Render(float scale) {
+    glPushMatrix();
+    glScalef( scale, scale, scale );
     SurfaceVertex* vertPointer = vertices;
     for ( int i = 0; i < strips; i++ ) {
         glBegin( GL_TRIANGLE_STRIP );
@@ -19,6 +20,7 @@ void SphereRenderModel::Render() {
         }
         glEnd();
     }
+    glPopMatrix();
 }
 
 Renderer::Renderer() {
@@ -34,16 +36,10 @@ Renderer::Renderer() {
     Viewport viewport;
     glGetIntegerv( GL_VIEWPORT, (int*)&viewport );
 
-    glm::mat4 view;
-    view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
-        glm::vec3( 0.0f, 0.0f, 0.0f ),
-        glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    glMatrixMode( GL_MODELVIEW );
-    glLoadMatrixf( glm::value_ptr( view ) );
-
     auto matProj = glm::perspective( glm::radians( 5.0f ), (float) viewport.width / viewport.height, 11.f, 100.f );
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr( matProj ) );
+    glMatrixMode( GL_MODELVIEW );
 
     glEnable( GL_LIGHTING );
     glClearColor( 0, 0.3f, 0, 0 );
@@ -52,28 +48,54 @@ Renderer::Renderer() {
     glm::vec4 ambientLight( 0, 0, 0, 1 );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( ambientLight ) );
 
-    Image texture( "..\\assets\\2k_earth_daymap.bmp" );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.data );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
     glEnable( GL_TEXTURE_2D );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+    glm::mat4 view;
+    view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
+        glm::vec3( 0.0f, 0.0f, 0.0f ),
+        glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    glLoadMatrixf( glm::value_ptr( view ) );
 }
 
-Renderer::~Renderer() {
+Renderer::~Renderer() {}
+
+void DrawStars() {
+    glPushMatrix();
+    glScalef( 2, 2, 2 );
+    glBegin( GL_TRIANGLE_STRIP );
+    glTexCoord2f( 0, 1 );
+    glVertex2f( -2, +1 );
+    glTexCoord2f( 0, 0 );
+    glVertex2f( -2, -1 );
+    glTexCoord2f( 1, 1 );
+    glVertex2f( +2, +1 );
+    glTexCoord2f( 1, 0 );
+    glVertex2f( +2, -1 );
+    glEnd();
+    glPopMatrix();
 }
 
 void Renderer::Render( Simulation & simulation ) {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    glMatrixMode( GL_MODELVIEW );
+    glBlendFunc( GL_ONE, GL_ZERO );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureStars.width, textureStars.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureStars.data );
+    glDisable( GL_LIGHTING );
+    DrawStars();
+    glEnable( GL_LIGHTING );
+
     glPushMatrix();
     glRotatef( 23, 1, 0, 0 );
     glRotated( simulation.sphereRotationAngle, 0, 1, 0 );
 
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );
+   
     glBlendFunc( GL_ZERO, GL_ZERO );
     sphere.Render();
 
