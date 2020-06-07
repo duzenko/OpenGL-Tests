@@ -1,15 +1,11 @@
 #include "Renderer.h"
 
 #include "glad.h"
-#include "GLFW/glfw3.h"
-#include "Utils.h"
+#include "Image.h"
 
-GLFWwindow* window;
-
-void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
-    if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-        glfwSetWindowShouldClose( window, GL_TRUE );
-}
+struct Viewport {
+    int x, y, width, height;
+};
 
 void SphereRenderModel::Render() {
     SurfaceVertex* vertPointer = vertices;
@@ -26,22 +22,6 @@ void SphereRenderModel::Render() {
 }
 
 Renderer::Renderer() {
-    if ( !glfwInit() )
-        return;
-
-    glfwWindowHint( GLFW_MAXIMIZED, GLFW_TRUE );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 1 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 0 );
-    window = glfwCreateWindow( 1280, 800, "OpenGL 1.0", NULL, NULL );
-    if ( !window ) {
-        glfwTerminate();
-        return;
-    }
-
-    glfwSetKeyCallback( window, key_callback );
-
-    glfwMakeContextCurrent( window );
-
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
         exit( -1 );
@@ -51,8 +31,8 @@ Renderer::Renderer() {
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &maxTextureSize );
     printf( "GL_MAX_TEXTURE_SIZE %d\n", maxTextureSize );
 
-    int width, height;
-    glfwGetWindowSize( window, &width, &height );
+    Viewport viewport;
+    glGetIntegerv( GL_VIEWPORT, (int*)&viewport );
 
     glm::mat4 view;
     view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
@@ -61,7 +41,7 @@ Renderer::Renderer() {
     glMatrixMode( GL_MODELVIEW );
     glLoadMatrixf( glm::value_ptr( view ) );
 
-    auto matProj = glm::perspective( glm::radians( 5.0f ), (float) width / height, 11.f, 100.f );
+    auto matProj = glm::perspective( glm::radians( 5.0f ), (float) viewport.width / viewport.height, 11.f, 100.f );
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr( matProj ) );
 
@@ -72,7 +52,11 @@ Renderer::Renderer() {
     glm::vec4 ambientLight( 0, 0, 0, 1 );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( ambientLight ) );
 
-    Utils::LoadBMP( "..\\assets\\2k_earth_daymap.bmp" );
+    Image texture( "..\\assets\\2k_earth_daymap.bmp" );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.data );
+
     glEnable( GL_TEXTURE_2D );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
@@ -80,43 +64,32 @@ Renderer::Renderer() {
 }
 
 Renderer::~Renderer() {
-    glfwTerminate();
 }
 
-bool Renderer::Render() {
-    float time = (float) glfwGetTime();
-
+void Renderer::Render( Simulation & simulation ) {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glRotatef( 23, 1, 0, 0 );
-    glRotated( time * 3e1, 0, 1, 0 );
+    glRotated( simulation.sphereRotationAngle, 0, 1, 0 );
 
     glBlendFunc( GL_ZERO, GL_ZERO );
     sphere.Render();
 
     glBlendFunc( GL_ONE, GL_ONE );
-    for ( int simLight = 0; simLight < LightsPerSphere; ) {
+    for ( int simLight = 0; simLight < simulation.LightsPerSphere; ) {
         for ( int light = GL_LIGHT0; light <= GL_LIGHT7; light++, simLight++ ) {
-            if ( simLight < LightsPerSphere )
+            if ( simLight < simulation.LightsPerSphere )
                 glEnable( light );
             else
                 glDisable( light );
-            auto& lightInfo = lights[simLight];
-            lightInfo.update( time );
+            auto& lightInfo = simulation.lights[simLight];
             glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
             glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
-            //glLightf( light, GL_QUADRATIC_ATTENUATION, 0 );
         }
         sphere.Render();
     }
 
     glPopMatrix();
-
-    glfwSwapBuffers( window );
-
-    glfwPollEvents();
-
-    return glfwWindowShouldClose( window );
 }

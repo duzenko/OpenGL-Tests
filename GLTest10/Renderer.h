@@ -10,6 +10,8 @@
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+#include "Simulation.h"
+
 struct SurfaceVertex {
 	glm::vec3 position;
 	glm::vec3 normal;
@@ -63,34 +65,12 @@ struct SphereRenderModel {
     void Render();
 };
 
-const int LightsPerSphere = 40;
-
-struct LightInfo {
-    glm::vec3 rotationOrigin;
-    glm::vec3 rotationNormal;
-    glm::vec4 color;
-    glm::vec4 position = glm::vec4( 0 );
-    float speed = glm::linearRand( 1, 3 ) * 1e-1f;
-
-    LightInfo() {
-        rotationOrigin = glm::sphericalRand( 1.1f );
-        rotationNormal = glm::cross( glm::sphericalRand( 1.f ), rotationOrigin );
-        color = glm::vec4( glm::abs( glm::sphericalRand( 1.f ) ), 1 );
-    }
-
-    void update( double time ) {
-        auto rotated = glm::rotate( rotationOrigin, (float) time * speed, rotationNormal );
-        position = glm::vec4( rotated, 1 );
-    }
-};
-
 struct Renderer {
     SphereRenderModel sphere = { 90 };
 
-    LightInfo lights[LightsPerSphere];
 
     Renderer();
     ~Renderer();
-    bool Render();
+    void Render(Simulation &simulation );
 };
 
