@@ -23,6 +23,28 @@ void SphereRenderModel::Render(float scale) {
     glPopMatrix();
 }
 
+void Renderer::DrawStars() {
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureStars.width, textureStars.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureStars.data );
+    glPushMatrix();
+    glScalef( 2, 2, 2 );
+    glBegin( GL_TRIANGLE_STRIP );
+    glTexCoord2f( 0, 1 );
+    glVertex2f( -2, +1 );
+    glTexCoord2f( 0, 0 );
+    glVertex2f( -2, -1 );
+    glTexCoord2f( 1, 1 );
+    glVertex2f( +2, +1 );
+    glTexCoord2f( 1, 0 );
+    glVertex2f( +2, -1 );
+    glEnd();
+    glPopMatrix();
+}
+
+void Renderer::DrawEarth() {
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );
+    sphere.Render();
+}
+
 Renderer::Renderer() {
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
@@ -61,43 +83,37 @@ Renderer::Renderer() {
         glm::vec3( 0.0f, 0.0f, 0.0f ),
         glm::vec3( 0.0f, 1.0f, 0.0f ) );
     glLoadMatrixf( glm::value_ptr( view ) );
+
+    dlStars = glGenLists( 1 );
+    glNewList( dlStars, GL_COMPILE );
+    DrawStars();
+    glEndList();
+
+    dlSphere = glGenLists( 1 );
+    glNewList( dlSphere, GL_COMPILE );
+    DrawEarth();
+    glEndList();
 }
 
-Renderer::~Renderer() {}
-
-void DrawStars() {
-    glPushMatrix();
-    glScalef( 2, 2, 2 );
-    glBegin( GL_TRIANGLE_STRIP );
-    glTexCoord2f( 0, 1 );
-    glVertex2f( -2, +1 );
-    glTexCoord2f( 0, 0 );
-    glVertex2f( -2, -1 );
-    glTexCoord2f( 1, 1 );
-    glVertex2f( +2, +1 );
-    glTexCoord2f( 1, 0 );
-    glVertex2f( +2, -1 );
-    glEnd();
-    glPopMatrix();
+Renderer::~Renderer() {
+    glDeleteLists( dlStars, 1 );
 }
 
 void Renderer::Render( Simulation & simulation ) {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glBlendFunc( GL_ONE, GL_ZERO );
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureStars.width, textureStars.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureStars.data );
     glDisable( GL_LIGHTING );
-    DrawStars();
+    glCallList( dlStars );
     glEnable( GL_LIGHTING );
 
     glPushMatrix();
     glRotatef( 23, 1, 0, 0 );
     glRotated( simulation.sphereRotationAngle, 0, 1, 0 );
 
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );
    
     glBlendFunc( GL_ZERO, GL_ZERO );
-    sphere.Render();
+    glCallList( dlSphere );
 
     glBlendFunc( GL_ONE, GL_ONE );
     for ( int simLight = 0; simLight < simulation.LightsPerSphere; ) {
@@ -110,7 +126,7 @@ void Renderer::Render( Simulation & simulation ) {
             glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
             glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
         }
-        sphere.Render();
+        glCallList( dlSphere );
     }
 
     glPopMatrix();

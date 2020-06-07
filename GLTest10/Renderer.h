@@ -72,8 +72,14 @@ struct Renderer {
     Image textureEarth = { "..\\assets\\2k_earth_daymap.bmp" };
     Image textureStars = { "..\\assets\\2k_stars_milky_way.bmp" };
 
+    int dlStars;
+    int dlSphere;
+
     Renderer();
     ~Renderer();
     void Render(Simulation &simulation );
+
+    void DrawStars();
+    void DrawEarth();
 };
 
