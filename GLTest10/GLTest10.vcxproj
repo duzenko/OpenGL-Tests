@@ -153,10 +153,15 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLTest10.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h" />
-    <ClInclude Include="utils.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Simulation.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
