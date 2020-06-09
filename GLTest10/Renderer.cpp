@@ -67,7 +67,7 @@ Renderer::Renderer() {
     glClearColor( 0, 0.3f, 0, 0 );
     glEnable( GL_BLEND );
     glEnable( GL_CULL_FACE );
-    glm::vec4 ambientLight( 0, 0, 0, 1 );
+    glm::vec4 ambientLight( .1, .1, .1, 1 );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( ambientLight ) );
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -99,6 +99,15 @@ Renderer::~Renderer() {
     glDeleteLists( dlStars, 1 );
 }
 
+void setLight( LightInfo lightInfo, int light ) {
+    if ( lightInfo.directional ) {
+        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
+    } else {
+        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
+    }
+    glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
+}
+
 void Renderer::Render( Simulation & simulation ) {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -107,12 +116,16 @@ void Renderer::Render( Simulation & simulation ) {
     glCallList( dlStars );
     glEnable( GL_LIGHTING );
 
+    glEnable( GL_LIGHT0 );
+    for ( int light = GL_LIGHT1; light <= GL_LIGHT7; light++ )
+        glDisable( light );
+    setLight( simulation.sunLight, GL_LIGHT0 );
+
     glPushMatrix();
-    glRotatef( 23, 1, 0, 0 );
+    glRotatef( -23, 0, 0, 1 );
     glRotated( simulation.sphereRotationAngle, 0, 1, 0 );
 
-   
-    glBlendFunc( GL_ZERO, GL_ZERO );
+    glBlendFunc( GL_ONE, GL_ZERO );
     glCallList( dlSphere );
 
     glBlendFunc( GL_ONE, GL_ONE );
@@ -122,9 +135,7 @@ void Renderer::Render( Simulation & simulation ) {
                 glEnable( light );
             else
                 glDisable( light );
-            auto& lightInfo = simulation.lights[simLight];
-            glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
-            glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
+            setLight( simulation.lights[simLight], light );
         }
         glCallList( dlSphere );
     }

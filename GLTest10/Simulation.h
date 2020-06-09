@@ -16,6 +16,7 @@ struct LightInfo {
     glm::vec4 color;
     glm::vec4 position = glm::vec4( 0 );
     float speed = glm::linearRand( 1, 3 ) * 1e-1f;
+    bool directional = false;
 
     LightInfo() {
         rotationOrigin = glm::sphericalRand( 1.1f );
@@ -24,16 +25,30 @@ struct LightInfo {
     }
 
     void update( double time ) {
+        if ( directional )
+            return;
         auto rotated = glm::rotate( rotationOrigin, (float) time * speed, rotationNormal );
         position = glm::vec4( rotated, 1 );
+    }
+};
+
+struct SunLight: LightInfo {
+    SunLight() {
+        directional = true;
+        position = glm::vec4( 1e9, 0, 0, 1 );
+        color = glm::vec4( 1, 1, 1, 1 );
     }
 };
 
 struct Simulation {
     static const int LightsPerSphere = 40;
     LightInfo lights[LightsPerSphere];
+    SunLight sunLight;
 
     float sphereRotationAngle = 0;
+
+    Simulation() {
+    }
 
     void Update( double time ) {
         sphereRotationAngle = (float) ( time * 3e1 );
