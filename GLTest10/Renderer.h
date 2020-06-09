@@ -83,4 +83,5 @@ struct Renderer {
     void DrawEarth();
 
     static bool wireframe;
+    static bool culling;
 };

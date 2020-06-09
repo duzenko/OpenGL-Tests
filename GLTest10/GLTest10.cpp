@@ -13,6 +13,8 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
         glfwSetWindowShouldClose( window, GLFW_TRUE );
     if ( key == GLFW_KEY_W )
         Renderer::wireframe = !Renderer::wireframe;
+    if ( key == GLFW_KEY_C )
+        Renderer::culling = !Renderer::culling;
 }
 
 int main() {

@@ -1,8 +1,11 @@
-#include "Renderer.h"
+﻿#include "Renderer.h"
 
 #include "glad.h"
+#include "ofbx.h"
 
 bool Renderer::wireframe = false;
+bool Renderer::culling = true;
+ofbx::IScene* g_scene;
 
 struct Viewport {
     int x, y, width, height;
@@ -25,7 +28,46 @@ void SphereRenderModel::Render(float scale) {
     glPopMatrix();
 }
 
+void LoadFbx() {
+    FILE* fp;
+    fopen_s(&fp, "..\\assets\\Rocks\\Rock0.fbx", "rb" );
+    if ( !fp ) return;
+
+    fseek( fp, 0, SEEK_END );
+    long file_size = ftell( fp );
+    fseek( fp, 0, SEEK_SET );
+    auto* content = new ofbx::u8[file_size];
+    fread( content, 1, file_size, fp );
+    g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
+}
+
+void DrawFbx() {
+    glDisable( GL_TEXTURE_2D );
+    auto mesh = g_scene->getMesh( 0 );
+    auto geometry = mesh->getGeometry();
+    auto verts = geometry->getVertices();
+    auto normals = geometry->getNormals();
+    auto ind = geometry->getFaceIndices();
+    glPushMatrix();
+    float s = 3e-3f;
+    glScalef( s, s, s );
+    glBegin( GL_TRIANGLES );
+    for ( int i = 0; i < geometry->getIndexCount(); i++ ) {
+        int index = ind[i];
+        index = index < 0 ? -index : index + 1;
+        auto vert = verts[index - 1];
+        auto norm = normals[index - 1];
+        glNormal3dv( &norm.x );
+        glColor3d( abs( norm.x ), abs( norm.y ), abs( norm.z ) );
+        glVertex3dv( &vert.x );
+    }
+    glEnd();
+    glPopMatrix();
+    glEnable( GL_TEXTURE_2D );
+}
+
 void Renderer::DrawStars() {
+    glDepthMask( GL_FALSE );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureStars.width, textureStars.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureStars.data );
     glPushMatrix();
     glScalef( 2, 2, 2 );
@@ -40,6 +82,7 @@ void Renderer::DrawStars() {
     glVertex2f( +2, -1 );
     glEnd();
     glPopMatrix();
+    glDepthMask( GL_TRUE );
 }
 
 void Renderer::DrawEarth() {
@@ -65,9 +108,7 @@ Renderer::Renderer() {
     glLoadMatrixf( glm::value_ptr( matProj ) );
     glMatrixMode( GL_MODELVIEW );
 
-    glEnable( GL_LIGHTING );
     glEnable( GL_BLEND );
-    glEnable( GL_CULL_FACE );
     glm::vec4 ambientLight( .1, .1, .1, 1 );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( ambientLight ) );
 
@@ -77,6 +118,7 @@ Renderer::Renderer() {
     glEnable( GL_TEXTURE_2D );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
+    glEnable( GL_NORMALIZE );
 
     glm::mat4 view;
     view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
@@ -93,6 +135,8 @@ Renderer::Renderer() {
     glNewList( dlSphere, GL_COMPILE );
     DrawEarth();
     glEndList();
+
+    LoadFbx();
 }
 
 Renderer::~Renderer() {
@@ -110,6 +154,10 @@ void setLight( LightInfo lightInfo, int light ) {
 
 void Renderer::Render( Simulation & simulation ) {
     glPolygonMode( GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL );
+    if(culling)
+        glEnable( GL_CULL_FACE );
+    else
+        glDisable( GL_CULL_FACE );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -122,6 +170,12 @@ void Renderer::Render( Simulation & simulation ) {
     for ( int light = GL_LIGHT1; light <= GL_LIGHT7; light++ )
         glDisable( light );
     setLight( simulation.sunLight, GL_LIGHT0 );
+
+    glPushMatrix(); 
+    glRotatef( simulation.sphereRotationAngle, 0, 1, 0 );
+    DrawFbx();
+    glPopMatrix();
+    return;
 
     glPushMatrix();
     glRotatef( -23, 0, 0, 1 );
