@@ -7,8 +7,12 @@
 GLFWwindow* window;
 
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
-    if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
+    if(action != GLFW_PRESS)
+        return;
+    if ( key == GLFW_KEY_ESCAPE  )
         glfwSetWindowShouldClose( window, GLFW_TRUE );
+    if ( key == GLFW_KEY_W )
+        Renderer::wireframe = !Renderer::wireframe;
 }
 
 int main() {

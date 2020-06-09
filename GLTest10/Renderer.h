@@ -81,5 +81,6 @@ struct Renderer {
 
     void DrawStars();
     void DrawEarth();
-};
 
+    static bool wireframe;
+};

@@ -2,6 +2,8 @@
 
 #include "glad.h"
 
+bool Renderer::wireframe = false;
+
 struct Viewport {
     int x, y, width, height;
 };
@@ -64,7 +66,6 @@ Renderer::Renderer() {
     glMatrixMode( GL_MODELVIEW );
 
     glEnable( GL_LIGHTING );
-    glClearColor( 0, 0.3f, 0, 0 );
     glEnable( GL_BLEND );
     glEnable( GL_CULL_FACE );
     glm::vec4 ambientLight( .1, .1, .1, 1 );
@@ -76,7 +77,6 @@ Renderer::Renderer() {
     glEnable( GL_TEXTURE_2D );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     glm::mat4 view;
     view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
@@ -109,6 +109,8 @@ void setLight( LightInfo lightInfo, int light ) {
 }
 
 void Renderer::Render( Simulation & simulation ) {
+    glPolygonMode( GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL );
+
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glBlendFunc( GL_ONE, GL_ZERO );
