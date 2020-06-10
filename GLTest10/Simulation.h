@@ -40,10 +40,31 @@ struct SunLight: LightInfo {
     }
 };
 
+struct Debris {
+    glm::vec3 rotationOrigin;
+    glm::vec3 rotationNormal;
+    glm::vec4 position = glm::vec4( 0 );
+    float speed = glm::linearRand( 1, 3 ) * 1e-1f;
+    int rockType = rand() % 11;
+
+    Debris() {
+        rotationOrigin = glm::sphericalRand( glm::linearRand(1.1f, 2.f) );
+        rotationNormal = glm::cross( glm::sphericalRand( 1.f ), rotationOrigin );
+    }
+
+    void update( double time ) {
+        auto rotated = glm::rotate( rotationOrigin, (float) time * speed, rotationNormal );
+        position = glm::vec4( rotated, 1 );
+    }
+};
+
 struct Simulation {
     static const int LightsPerSphere = 40;
     LightInfo lights[LightsPerSphere];
     SunLight sunLight;
+
+    static const int DebriCount = 40;
+    Debris debris[DebriCount];
 
     float sphereRotationAngle = 0;
 
@@ -55,6 +76,10 @@ struct Simulation {
         for ( int simLight = 0; simLight < LightsPerSphere; simLight++ ) {
             auto& lightInfo = lights[simLight];
             lightInfo.update( time );
+        }
+        for ( int i = 0; i< DebriCount; i++ ) {
+            auto& debri = debris[i];
+            debri.update( time );
         }
     }
 };

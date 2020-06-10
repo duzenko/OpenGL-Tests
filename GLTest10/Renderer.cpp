@@ -2,14 +2,16 @@
 
 #include "glad.h"
 #include "ofbx.h"
+#include "Util.h"
 
 bool Renderer::wireframe = false;
 bool Renderer::culling = true;
-ofbx::IScene* g_scene;
 
 struct Viewport {
     int x, y, width, height;
 };
+
+int dlRock[11];
 
 void SphereRenderModel::Render(float scale) {
     glPushMatrix();
@@ -28,9 +30,10 @@ void SphereRenderModel::Render(float scale) {
     glPopMatrix();
 }
 
-void LoadFbx() {
+void LoadFbx( int rockType ) {
     FILE* fp;
-    fopen_s(&fp, "..\\assets\\Rocks\\Rock0.fbx", "rb" );
+    auto fn = string_format( "..\\assets\\Rocks\\Rock%d.fbx", rockType );
+    fopen_s(&fp, fn.c_str(), "rb" );
     if ( !fp ) return;
 
     fseek( fp, 0, SEEK_END );
@@ -38,10 +41,10 @@ void LoadFbx() {
     fseek( fp, 0, SEEK_SET );
     auto* content = new ofbx::u8[file_size];
     fread( content, 1, file_size, fp );
-    g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
-}
+    ofbx::IScene* g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
 
-void DrawFbx() {
+    dlRock[rockType] = glGenLists( 1 );
+    glNewList( dlRock[rockType], GL_COMPILE );
     glDisable( GL_TEXTURE_2D );
     auto mesh = g_scene->getMesh( 0 );
     auto geometry = mesh->getGeometry();
@@ -49,7 +52,7 @@ void DrawFbx() {
     auto normals = geometry->getNormals();
     auto ind = geometry->getFaceIndices();
     glPushMatrix();
-    float s = 3e-3f;
+    float s = 1e-4f;
     glScalef( s, s, s );
     glBegin( GL_TRIANGLES );
     for ( int i = 0; i < geometry->getIndexCount(); i++ ) {
@@ -58,12 +61,19 @@ void DrawFbx() {
         auto vert = verts[index - 1];
         auto norm = normals[index - 1];
         glNormal3dv( &norm.x );
-        glColor3d( abs( norm.x ), abs( norm.y ), abs( norm.z ) );
         glVertex3dv( &vert.x );
     }
     glEnd();
     glPopMatrix();
     glEnable( GL_TEXTURE_2D );
+    glEndList();
+    //delete g_scene;
+}
+
+void DrawFbx( int rockType ) {
+    if ( !dlRock[rockType] )
+        LoadFbx( rockType );
+    glCallList( dlRock[rockType] );
 }
 
 void Renderer::DrawStars() {
@@ -135,8 +145,6 @@ Renderer::Renderer() {
     glNewList( dlSphere, GL_COMPILE );
     DrawEarth();
     glEndList();
-
-    LoadFbx();
 }
 
 Renderer::~Renderer() {
@@ -152,9 +160,9 @@ void setLight( LightInfo lightInfo, int light ) {
     glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
 }
 
-void Renderer::Render( Simulation & simulation ) {
+void Renderer::Render( Simulation& simulation ) {
     glPolygonMode( GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL );
-    if(culling)
+    if ( culling )
         glEnable( GL_CULL_FACE );
     else
         glDisable( GL_CULL_FACE );
@@ -171,11 +179,14 @@ void Renderer::Render( Simulation & simulation ) {
         glDisable( light );
     setLight( simulation.sunLight, GL_LIGHT0 );
 
-    glPushMatrix(); 
-    glRotatef( simulation.sphereRotationAngle, 0, 1, 0 );
-    DrawFbx();
-    glPopMatrix();
-    return;
+    for ( int i = 0; i < simulation.DebriCount; i++ ) {
+        auto &debris = simulation.debris[i];
+        glPushMatrix();
+        glTranslatef( debris.position.x, debris.position.y, debris.position.z );
+        glRotatef( simulation.sphereRotationAngle, debris.rotationNormal.x, debris.rotationNormal.y, debris.rotationNormal.z );
+        DrawFbx( debris.rockType );
+        glPopMatrix();
+    }
 
     glPushMatrix();
     glRotatef( -23, 0, 0, 1 );
