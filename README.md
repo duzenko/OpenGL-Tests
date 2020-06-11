@@ -1,5 +1,5 @@
 # Compiling
-The project requires the following libraies installed in the root folder
+The project requires the following libraries installed in the root folder
 
 * https://www.glfw.org/download.html (Windows binaries)
 * https://github.com/g-truc/glm (unpack zip)
