@@ -59,7 +59,7 @@ struct Debris {
 };
 
 struct Simulation {
-    static const int LightsPerSphere = 40;
+    static const int LightsPerSphere = 4;
     LightInfo lights[LightsPerSphere];
     SunLight sunLight;
 

@@ -67,20 +67,13 @@ struct SphereRenderModel {
 };
 
 struct Renderer {
-    SphereRenderModel sphere = { 90 };
-
-    Image textureEarth = { "..\\assets\\2k_earth_daymap.bmp" };
-    Image textureStars = { "..\\assets\\2k_stars_milky_way.bmp" };
-
     int dlStars;
-    int dlSphere;
+    int dlEarth;
+    int dlMoon;
 
     Renderer();
     ~Renderer();
     void Render(Simulation &simulation );
-
-    void DrawStars();
-    void DrawEarth();
 
     static bool wireframe;
     static bool culling;
