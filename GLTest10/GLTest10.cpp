@@ -8,16 +8,22 @@ GLFWwindow* window;
 bool swapInterval = true;
 
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
-    if(action != GLFW_PRESS)
-        return;
-    if ( key == GLFW_KEY_ESCAPE  )
-        glfwSetWindowShouldClose( window, GLFW_TRUE );
-    if ( key == GLFW_KEY_W )
-        Renderer::wireframe = !Renderer::wireframe;
-    if ( key == GLFW_KEY_C )
-        Renderer::culling = !Renderer::culling;
-    if ( key == GLFW_KEY_V )
-        glfwSwapInterval( swapInterval = !swapInterval );
+    if ( action == GLFW_PRESS ) {
+        if ( key == GLFW_KEY_ESCAPE )
+            glfwSetWindowShouldClose( window, GLFW_TRUE );
+        if ( key == GLFW_KEY_W )
+            Renderer::wireframe = !Renderer::wireframe;
+        if ( key == GLFW_KEY_C )
+            Renderer::culling = !Renderer::culling;
+        if ( key == GLFW_KEY_V )
+            glfwSwapInterval( swapInterval = !swapInterval );
+    }
+    if ( action != GLFW_RELEASE ) {
+        if ( key == GLFW_KEY_LEFT )
+            Renderer::cameraAngle -= 1e-2;
+        if ( key == GLFW_KEY_RIGHT )
+            Renderer::cameraAngle += 1e-2;
+    }
 }
 
 int main() {

@@ -70,6 +70,7 @@ struct Renderer {
     int dlStars;
     int dlEarth;
     int dlMoon;
+    int dlSun;
 
     Renderer();
     ~Renderer();
@@ -77,4 +78,5 @@ struct Renderer {
 
     static bool wireframe;
     static bool culling;
+    static float cameraAngle;
 };

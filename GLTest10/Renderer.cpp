@@ -6,6 +6,7 @@
 
 bool Renderer::wireframe = false;
 bool Renderer::culling = true;
+float Renderer::cameraAngle = 0;
 
 struct Viewport {
     int x, y, width, height;
@@ -125,6 +126,18 @@ GLuint DrawMoon() {
     return dlSphere;
 }
 
+GLuint DrawSun() {
+    auto dlSphere = glGenLists( 1 );
+    Image textureEarth = { "..\\assets\\2k_sun.bmp" };
+    SphereRenderModel sphere = { 30 };
+    glNewList( dlSphere, GL_COMPILE );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );
+    glScalef( 696, 696, 696 );
+    sphere.Render();
+    glEndList();
+    return dlSphere;
+}
+
 Renderer::Renderer() {
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
@@ -138,7 +151,7 @@ Renderer::Renderer() {
     Viewport viewport;
     glGetIntegerv( GL_VIEWPORT, (int*)&viewport );
 
-    auto matProj = glm::perspective( glm::radians( 5.0f ), (float) viewport.width / viewport.height, 11.f, 1e3f );
+    auto matProj = glm::perspective( glm::radians( 5.0f ), (float) viewport.width / viewport.height, 11.f, 1e6f );
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr( matProj ) );
     glMatrixMode( GL_MODELVIEW );
@@ -155,15 +168,10 @@ Renderer::Renderer() {
     glDepthFunc( GL_LEQUAL );
     glEnable( GL_NORMALIZE );
 
-    glm::mat4 view;
-    view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
-        glm::vec3( 0.0f, 0.0f, 0.0f ),
-        glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    glLoadMatrixf( glm::value_ptr( view ) );
-
     dlStars = DrawStars();
     dlEarth = DrawEarth();
     dlMoon = DrawMoon();
+    dlSun = DrawSun();
 }
 
 Renderer::~Renderer() {
@@ -180,6 +188,13 @@ void setLight( LightInfo lightInfo, int light ) {
 }
 
 void Renderer::Render( Simulation& simulation ) {
+    glm::mat4 view;
+    view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
+        glm::vec3( 0.0f, 0.0f, 0.0f ),
+        glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    view = glm::rotate( view, cameraAngle, glm::vec3(0, 1, 0) );
+    glLoadMatrixf( glm::value_ptr( view ) );
+
     glPolygonMode( GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL );
     if ( culling )
         glEnable( GL_CULL_FACE );
@@ -191,6 +206,13 @@ void Renderer::Render( Simulation& simulation ) {
     glBlendFunc( GL_ONE, GL_ZERO );
     glDisable( GL_LIGHTING );
     glCallList( dlStars );
+
+    glPushMatrix();
+    glRotatef( -90, 0, 1, 0 );
+    glTranslatef( 0, 0, -149600 );
+    glCallList( dlSun );
+    glPopMatrix();
+
     glEnable( GL_LIGHTING );
 
     glEnable( GL_LIGHT0 );
@@ -219,6 +241,7 @@ void Renderer::Render( Simulation& simulation ) {
 
     glCallList( dlEarth );
 
+    return;
     glBlendFunc( GL_ONE, GL_ONE );
     for ( int simLight = 0; simLight < simulation.LightsPerSphere; ) {
         for ( int light = GL_LIGHT0; light <= GL_LIGHT7; light++, simLight++ ) {
