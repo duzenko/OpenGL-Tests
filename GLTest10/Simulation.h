@@ -48,7 +48,7 @@ struct Debris {
     int rockType = rand() % 11;
 
     Debris() {
-        rotationOrigin = glm::sphericalRand( glm::linearRand(1.1f, 2.f) );
+        rotationOrigin = glm::sphericalRand( glm::linearRand(7.f, 11.f) );
         rotationNormal = glm::cross( glm::sphericalRand( 1.f ), rotationOrigin );
     }
 

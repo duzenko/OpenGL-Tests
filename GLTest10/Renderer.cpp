@@ -53,7 +53,7 @@ void LoadFbx( int rockType ) {
     auto normals = geometry->getNormals();
     auto ind = geometry->getFaceIndices();
     glPushMatrix();
-    float s = 1e-4f;
+    float s = 3e-4f;
     glScalef( s, s, s );
     glBegin( GL_TRIANGLES );
     for ( int i = 0; i < geometry->getIndexCount(); i++ ) {
@@ -84,10 +84,12 @@ GLuint DrawStars() {
     glPushMatrix();
     glColor3f( 1, 1, 1 );
     glBegin( GL_POINTS );
-    for ( int i = 0; i < 10000; i++ ) {
-        auto v2 = glm::diskRand( 2e5f );
-        glm::vec3 v( v2.x, glm::linearRand( -1e4f, 1e4f), v2.y );
-        auto color = glm::abs( glm::sphericalRand(1.f) );
+    for ( int i = 0; i < 30000; i++ ) {
+        auto v2 = glm::diskRand( 4e8f );
+        glm::vec3 v( v2.x, glm::linearRand( -1e7f, 1e7f), v2.y );
+        auto color = glm::abs( glm::sphericalRand(1.f) / 3.f );
+        color.g += color.b;
+        color.r += color.g;
         glColor3fv( glm::value_ptr( color ) );
         glVertex3fv( glm::value_ptr( v ) );
     }
@@ -189,10 +191,12 @@ Renderer::Renderer() {
     Viewport viewport;
     glGetIntegerv( GL_VIEWPORT, (int*)&viewport );
 
-    auto matProj = glm::perspective( glm::radians( 15.0f ), (float) viewport.width / viewport.height, 11.f, 1e6f );
+    auto matProj = glm::infinitePerspective( glm::radians( 5.0f ), (float) viewport.width / viewport.height, 11.f );
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr( matProj ) );
     glMatrixMode( GL_MODELVIEW );
+
+    glPointSize( (viewport.height >> 10) + 1.f );
 
     glEnable( GL_BLEND );
     glm::vec4 ambientLight( .1, .1, .1, 1 );
