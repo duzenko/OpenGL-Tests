@@ -78,6 +78,27 @@ void DrawFbx( int rockType ) {
 }
 
 GLuint DrawStars() {
+    auto dlStars = glGenLists( 1 );
+    glNewList( dlStars, GL_COMPILE );
+    glDepthMask( GL_FALSE );
+    glPushMatrix();
+    glColor3f( 1, 1, 1 );
+    glBegin( GL_POINTS );
+    for ( int i = 0; i < 10000; i++ ) {
+        auto v2 = glm::diskRand( 2e5f );
+        glm::vec3 v( v2.x, glm::linearRand( -1e4f, 1e4f), v2.y );
+        auto color = glm::abs( glm::sphericalRand(1.f) );
+        glColor3fv( glm::value_ptr( color ) );
+        glVertex3fv( glm::value_ptr( v ) );
+    }
+    glEnd();
+    glPopMatrix();
+    glDepthMask( GL_TRUE );
+    glEndList();
+    return dlStars;
+}
+
+GLuint DrawStars3() {
     Image textureStars = { "..\\assets\\2k_stars_milky_way.bmp" };
     auto dlStars = glGenLists( 1 );
     glNewList( dlStars, GL_COMPILE );
@@ -101,6 +122,22 @@ GLuint DrawStars() {
     return dlStars;
 }
 
+GLuint DrawStars2() {
+    auto dlSphere = glGenLists( 1 );
+    Image texture = { "..\\assets\\2k_stars_milky_way.bmp" };
+    SphereRenderModel sphere = { 90 };
+    glNewList( dlSphere, GL_COMPILE );
+    glDepthMask( GL_FALSE );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.data );
+    glPushMatrix();
+    glScalef( 1e3f, 1e3f, 1e3f );
+    sphere.Render();
+    glPopMatrix();
+    glDepthMask( GL_TRUE );
+    glEndList();
+    return dlSphere;
+}
+
 GLuint DrawEarth() {
     auto dlSphere = glGenLists( 1 );
     Image textureEarth = { "..\\assets\\2k_earth_daymap.bmp" };
@@ -108,6 +145,7 @@ GLuint DrawEarth() {
     glNewList( dlSphere, GL_COMPILE );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );
     glPushMatrix();
+    glScalef( 6.371f, 6.371f, 6.371f );
     sphere.Render();
     glPopMatrix();
     glEndList();
@@ -151,7 +189,7 @@ Renderer::Renderer() {
     Viewport viewport;
     glGetIntegerv( GL_VIEWPORT, (int*)&viewport );
 
-    auto matProj = glm::perspective( glm::radians( 5.0f ), (float) viewport.width / viewport.height, 11.f, 1e6f );
+    auto matProj = glm::perspective( glm::radians( 15.0f ), (float) viewport.width / viewport.height, 11.f, 1e6f );
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr( matProj ) );
     glMatrixMode( GL_MODELVIEW );
@@ -189,7 +227,7 @@ void setLight( LightInfo lightInfo, int light ) {
 
 void Renderer::Render( Simulation& simulation ) {
     glm::mat4 view;
-    view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 33.0f ),
+    view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 233.0f ),
         glm::vec3( 0.0f, 0.0f, 0.0f ),
         glm::vec3( 0.0f, 1.0f, 0.0f ) );
     view = glm::rotate( view, cameraAngle, glm::vec3(0, 1, 0) );
@@ -241,7 +279,6 @@ void Renderer::Render( Simulation& simulation ) {
 
     glCallList( dlEarth );
 
-    return;
     glBlendFunc( GL_ONE, GL_ONE );
     for ( int simLight = 0; simLight < simulation.LightsPerSphere; ) {
         for ( int light = GL_LIGHT0; light <= GL_LIGHT7; light++, simLight++ ) {
@@ -251,7 +288,7 @@ void Renderer::Render( Simulation& simulation ) {
                 glDisable( light );
             setLight( simulation.lights[simLight], light );
         }
-        glCallList( dlEarth );
+        //glCallList( dlEarth );
     }
 
     glPopMatrix();

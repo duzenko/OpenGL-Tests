@@ -42,6 +42,7 @@ int main() {
     glfwSetKeyCallback( window, key_callback );
 
     glfwMakeContextCurrent( window );
+    glfwSwapInterval( swapInterval );
 
     Renderer renderer;
     Simulation simulation;
