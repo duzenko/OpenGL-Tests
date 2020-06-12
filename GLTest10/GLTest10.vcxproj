@@ -160,6 +160,7 @@
     <ClInclude Include="..\OpenFBX-master\src\ofbx.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderModels.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Util.h" />

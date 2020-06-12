@@ -1,4 +1,5 @@
 ﻿#include "Renderer.h"
+#include "RenderModels.h"
 
 #include "glad.h"
 #include "ofbx.h"
@@ -12,9 +13,7 @@ struct Viewport {
     int x, y, width, height;
 };
 
-int dlRock[11];
-
-void SphereRenderModel::Render(float scale) {
+void SphereRenderModel::Render( float scale ) {
     glPushMatrix();
     glScalef( scale, scale, scale );
     SurfaceVertex* vertPointer = vertices;
@@ -30,8 +29,31 @@ void SphereRenderModel::Render(float scale) {
     }
     glPopMatrix();
 }
+void RoundStripRenderModel::Render( float scale ) {
+    glPushMatrix();
+    glScalef( scale, scale, scale );
+    SurfaceVertex* vertPointer = vertices;
+        glBegin( GL_TRIANGLE_STRIP );
+        for ( int j = 0; j < vertsPerStrip; j++ ) {
+            glTexCoord2fv( glm::value_ptr( vertPointer->texCoord ) );
+            glNormal3fv( glm::value_ptr( vertPointer->normal ) );
+            glVertex3fv( glm::value_ptr( vertPointer->position ) );
+            vertPointer++;
+        }
+        glEnd();
+    glPopMatrix();
+}
 
-void LoadFbx( int rockType ) {
+void setLight( LightInfo lightInfo, int light ) {
+    if ( lightInfo.directional ) {
+        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
+    } else {
+        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
+    }
+    glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
+}
+
+void LoadFbx( int dl, int rockType ) {
     FILE* fp;
     auto fn = string_format( "..\\assets\\Rocks\\Rock%d.fbx", rockType );
     fopen_s(&fp, fn.c_str(), "rb" );
@@ -44,8 +66,7 @@ void LoadFbx( int rockType ) {
     fread( content, 1, file_size, fp );
     ofbx::IScene* g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
 
-    dlRock[rockType] = glGenLists( 1 );
-    glNewList( dlRock[rockType], GL_COMPILE );
+    glNewList( dl, GL_COMPILE );
     glDisable( GL_TEXTURE_2D );
     auto mesh = g_scene->getMesh( 0 );
     auto geometry = mesh->getGeometry();
@@ -72,68 +93,25 @@ void LoadFbx( int rockType ) {
 }
 
 void DrawFbx( int rockType ) {
-    if ( !dlRock[rockType] )
-        LoadFbx( rockType );
+    static int dlRock[11];
+    if ( !dlRock[rockType] ) {
+        dlRock[rockType] = glGenLists( 1 );
+        LoadFbx( dlRock[rockType], rockType );
+    }
     glCallList( dlRock[rockType] );
 }
 
 GLuint DrawStars() {
-    auto dlStars = glGenLists( 1 );
-    glNewList( dlStars, GL_COMPILE );
-    glDepthMask( GL_FALSE );
-    glPushMatrix();
-    glColor3f( 1, 1, 1 );
-    glBegin( GL_POINTS );
-    for ( int i = 0; i < 30000; i++ ) {
-        auto v2 = glm::diskRand( 4e8f );
-        glm::vec3 v( v2.x, glm::linearRand( -1e7f, 1e7f), v2.y );
-        auto color = glm::abs( glm::sphericalRand(1.f) / 3.f );
-        color.g += color.b;
-        color.r += color.g;
-        glColor3fv( glm::value_ptr( color ) );
-        glVertex3fv( glm::value_ptr( v ) );
-    }
-    glEnd();
-    glPopMatrix();
-    glDepthMask( GL_TRUE );
-    glEndList();
-    return dlStars;
-}
-
-GLuint DrawStars3() {
-    Image textureStars = { "..\\assets\\2k_stars_milky_way.bmp" };
-    auto dlStars = glGenLists( 1 );
-    glNewList( dlStars, GL_COMPILE );
-    glDepthMask( GL_FALSE );
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureStars.width, textureStars.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureStars.data );
-    glPushMatrix();
-    glScalef( 2, 2, 2 );
-    glBegin( GL_TRIANGLE_STRIP );
-    glTexCoord2f( 0, 1 );
-    glVertex2f( -2, +1 );
-    glTexCoord2f( 0, 0 );
-    glVertex2f( -2, -1 );
-    glTexCoord2f( 1, 1 );
-    glVertex2f( +2, +1 );
-    glTexCoord2f( 1, 0 );
-    glVertex2f( +2, -1 );
-    glEnd();
-    glPopMatrix();
-    glDepthMask( GL_TRUE );
-    glEndList();
-    return dlStars;
-}
-
-GLuint DrawStars2() {
     auto dlSphere = glGenLists( 1 );
     Image texture = { "..\\assets\\2k_stars_milky_way.bmp" };
-    SphereRenderModel sphere = { 90 };
+    RoundStripRenderModel strip = { 90 };
+    //SphereRenderModel strip = { 90 };
     glNewList( dlSphere, GL_COMPILE );
     glDepthMask( GL_FALSE );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.data );
     glPushMatrix();
     glScalef( 1e3f, 1e3f, 1e3f );
-    sphere.Render();
+    strip.Render();
     glPopMatrix();
     glDepthMask( GL_TRUE );
     glEndList();
@@ -218,15 +196,6 @@ Renderer::Renderer() {
 
 Renderer::~Renderer() {
     glDeleteLists( dlStars, 1 );
-}
-
-void setLight( LightInfo lightInfo, int light ) {
-    if ( lightInfo.directional ) {
-        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
-    } else {
-        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
-    }
-    glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
 }
 
 void Renderer::Render( Simulation& simulation ) {
