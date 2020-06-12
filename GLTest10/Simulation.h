@@ -2,6 +2,7 @@
 
 #define _USE_MATH_DEFINES // for C++
 #include <math.h>
+#include <vector>
 
 #include <glm/ext/matrix_float4x4.hpp> 
 #include <glm/ext/matrix_clip_space.hpp> 
@@ -11,76 +12,102 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 struct LightInfo {
-    glm::vec3 rotationOrigin;
-    glm::vec3 rotationNormal;
-    glm::vec4 color;
-    glm::vec4 position = glm::vec4( 0 );
+    glm::vec3 color = glm::vec3( 1 );
+    glm::vec3 position = glm::vec3( 0 );
     float speed = glm::linearRand( 1, 3 ) * 1e-1f;
     bool directional = false;
 
     LightInfo() {
-        rotationOrigin = glm::sphericalRand( 1.1f );
-        rotationNormal = glm::cross( glm::sphericalRand( 1.f ), rotationOrigin );
-        color = glm::vec4( glm::abs( glm::sphericalRand( 1.f ) ), 1 );
     }
 
     void update( double time ) {
-        if ( directional )
-            return;
-        auto rotated = glm::rotate( rotationOrigin, (float) time * speed, rotationNormal );
-        position = glm::vec4( rotated, 1 );
     }
 };
 
 struct SunLight: LightInfo {
     SunLight() {
         directional = true;
-        position = glm::vec4( 1e9, 0, 0, 1 );
-        color = glm::vec4( 1, 1, 1, 1 );
+        position = glm::vec4( 150e3, 0, 0, 1 );
     }
 };
 
-struct Debris {
+struct Simulation;
+
+struct FlareLight : LightInfo {
+    double startTime;
+    bool dead = false;
+    FlareLight(double time) {
+        startTime = time;
+        color = glm::vec4( glm::abs( glm::sphericalRand( 1.f ) ), 1 );
+    }
+    void update( Simulation& simulation );
+};
+
+struct Debri {
     glm::vec3 rotationOrigin;
     glm::vec3 rotationNormal;
-    glm::vec4 position = glm::vec4( 0 );
+    glm::vec3 position = glm::sphericalRand( 33.f );
     float speed = glm::linearRand( 1, 3 ) * 1e-1f;
     int rockType = rand() % 11;
+    bool destroyed = false;
+    bool flared = false;
 
-    Debris() {
+    Debri() {
         rotationOrigin = glm::sphericalRand( glm::linearRand(7.f, 11.f) );
         rotationNormal = glm::cross( glm::sphericalRand( 1.f ), rotationOrigin );
     }
 
-    void update( double time ) {
-        auto rotated = glm::rotate( rotationOrigin, (float) time * speed, rotationNormal );
-        position = glm::vec4( rotated, 1 );
-    }
+    void update( Simulation& simulation );
 };
 
 struct Simulation {
-    static const int LightsPerSphere = 4;
-    LightInfo lights[LightsPerSphere];
+    double time = 0;
+    float tick = 0;
     SunLight sunLight;
+    
+    std::vector<FlareLight> lights;
 
-    static const int DebriCount = 40;
-    Debris debris[DebriCount];
+    std::vector<Debri> debris;
 
     float sphereRotationAngle = 0;
 
     Simulation() {
     }
 
-    void Update( double time ) {
-        sphereRotationAngle = (float) ( time * 3e1 );
-        for ( int simLight = 0; simLight < LightsPerSphere; simLight++ ) {
+    void Update( double newTime ) {
+        tick = fmin(1e-1f, (float) ( newTime - time ));
+        time = newTime;
+        sphereRotationAngle = (float) ( newTime * 3e1 );
+        for ( size_t simLight = 0; simLight < lights.size(); simLight++ ) {
             auto& lightInfo = lights[simLight];
-            lightInfo.update( time );
+            lightInfo.update( *this );
         }
-        for ( int i = 0; i< DebriCount; i++ ) {
+        lights.erase( std::remove_if( lights.begin(), lights.end(),
+            []( FlareLight light ) { return light.dead; } ), lights.end() );
+        static float newDebris = 0;
+        newDebris += 1e2f * tick * rand() / RAND_MAX;
+        for ( int i = 1; i < newDebris; newDebris-- )
+            SpawnDebri();
+        for ( size_t i = 0; i < debris.size(); i++ ) {
             auto& debri = debris[i];
-            debri.update( time );
+            debri.update( *this );
+            if ( debri.destroyed ) {
+                SpawnDebri();
+            }
         }
+        debris.erase( std::remove_if( debris.begin(), debris.end(),
+            []( Debri debri ) { return debri.destroyed; } ), debris.end() );
+    }
+
+    void SpawnDebri() {
+        Debri newDebri;
+        debris.push_back( newDebri );
+    }
+
+    void CreateFlare( glm::vec3& position ) {
+        FlareLight newLight( time );
+        newLight.position = glm::normalize( position ) * 7.f;
+        lights.push_back( newLight );
     }
 };
 

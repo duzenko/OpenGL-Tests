@@ -45,12 +45,10 @@ void RoundStripRenderModel::Render( float scale ) {
 }
 
 void setLight( LightInfo lightInfo, int light ) {
-    if ( lightInfo.directional ) {
-        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
-    } else {
-        glLightfv( light, GL_POSITION, glm::value_ptr( lightInfo.position ) );
-    }
-    glLightfv( light, GL_DIFFUSE, glm::value_ptr( lightInfo.color ) );
+    glm::vec4 pos4( lightInfo.position, 1 );
+    glm::vec4 color4( lightInfo.color, 1 );
+    glLightfv( light, GL_POSITION, glm::value_ptr( pos4 ) );
+    glLightfv( light, GL_DIFFUSE, glm::value_ptr( color4 ) );
 }
 
 void LoadFbx( int dl, int rockType ) {
@@ -177,7 +175,7 @@ Renderer::Renderer() {
     glPointSize( (viewport.height >> 10) + 1.f );
 
     glEnable( GL_BLEND );
-    glm::vec4 ambientLight( .1, .1, .1, 1 );
+    glm::vec4 ambientLight( 0, 0, 0, 1 );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( ambientLight ) );
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -231,12 +229,12 @@ void Renderer::Render( Simulation& simulation ) {
         glDisable( light );
     setLight( simulation.sunLight, GL_LIGHT0 );
 
-    for ( int i = 0; i < simulation.DebriCount; i++ ) {
-        auto &debris = simulation.debris[i];
+    for ( size_t i = 0; i < simulation.debris.size(); i++ ) {
+        auto &debri = simulation.debris[i];
         glPushMatrix();
-        glTranslatef( debris.position.x, debris.position.y, debris.position.z );
-        glRotatef( simulation.sphereRotationAngle, debris.rotationNormal.x, debris.rotationNormal.y, debris.rotationNormal.z );
-        DrawFbx( debris.rockType );
+        glTranslatef( debri.position.x, debri.position.y, debri.position.z );
+        glRotatef( simulation.sphereRotationAngle, debri.rotationNormal.x, debri.rotationNormal.y, debri.rotationNormal.z );
+        DrawFbx( debri.rockType );
         glPopMatrix();
     }
 
@@ -247,21 +245,24 @@ void Renderer::Render( Simulation& simulation ) {
     glPopMatrix();
 
     glPushMatrix();
-    glRotatef( -23, 0, 0, 1 );
-    glRotated( simulation.sphereRotationAngle, 0, 1, 0 );
+    //glRotatef( -23, 0, 0, 1 );
+    //glRotated( simulation.sphereRotationAngle, 0, 1, 0 );
 
     glCallList( dlEarth );
 
     glBlendFunc( GL_ONE, GL_ONE );
-    for ( int simLight = 0; simLight < simulation.LightsPerSphere; ) {
+    for ( size_t simLight = 0; simLight < simulation.lights.size(); ) {
         for ( int light = GL_LIGHT0; light <= GL_LIGHT7; light++, simLight++ ) {
-            if ( simLight < simulation.LightsPerSphere )
+            if ( simLight < simulation.lights.size() )
                 glEnable( light );
             else
                 glDisable( light );
-            setLight( simulation.lights[simLight], light );
+            if ( simLight >= simulation.lights.size() )
+                break;
+            auto &lightInfo = simulation.lights[simLight];
+            setLight( lightInfo, light );
         }
-        //glCallList( dlEarth );
+        glCallList( dlEarth );
     }
 
     glPopMatrix();
