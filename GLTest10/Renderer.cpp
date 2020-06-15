@@ -101,7 +101,7 @@ void DrawFbx( int rockType ) {
 
 GLuint DrawStars() {
     auto dlSphere = glGenLists( 1 );
-    Image texture = { "..\\assets\\2k_stars_milky_way.bmp" };
+    Image texture = { "..\\assets\\2k_stars_milky_way.jpg" };
     RoundStripRenderModel strip = { 90 };
     //SphereRenderModel strip = { 90 };
     glNewList( dlSphere, GL_COMPILE );
@@ -118,7 +118,7 @@ GLuint DrawStars() {
 
 GLuint DrawEarth() {
     auto dlSphere = glGenLists( 1 );
-    Image textureEarth = { "..\\assets\\2k_earth_daymap.bmp" };
+    Image textureEarth = { "..\\assets\\2k_earth_daymap.jpg" };
     SphereRenderModel sphere = { 90 };
     glNewList( dlSphere, GL_COMPILE );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );
@@ -132,7 +132,7 @@ GLuint DrawEarth() {
 
 GLuint DrawMoon() {
     auto dlSphere = glGenLists( 1 );
-    Image textureEarth = { "..\\assets\\2k_moon.bmp" };
+    Image textureEarth = { "..\\assets\\2k_moon.jpg" };
     SphereRenderModel sphere = { 30 };
     glNewList( dlSphere, GL_COMPILE );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );
@@ -144,7 +144,7 @@ GLuint DrawMoon() {
 
 GLuint DrawSun() {
     auto dlSphere = glGenLists( 1 );
-    Image textureEarth = { "..\\assets\\2k_sun.bmp" };
+    Image textureEarth = { "..\\assets\\2k_sun.jpg" };
     SphereRenderModel sphere = { 30 };
     glNewList( dlSphere, GL_COMPILE );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, textureEarth.width, textureEarth.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureEarth.data );

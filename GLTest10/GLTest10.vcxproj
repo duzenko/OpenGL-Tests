@@ -156,6 +156,7 @@
     <ClCompile Include="Image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\jpeg_decoder.h" />
     <ClInclude Include="..\OpenFBX-master\src\miniz.h" />
     <ClInclude Include="..\OpenFBX-master\src\ofbx.h" />
     <ClInclude Include="glad.h" />

@@ -1,49 +1,36 @@
 #include "Image.h"
 
 #include <cstdio>
+#include "..\jpeg_decoder.h"
 
 Image::Image( const char* fileName ) {
-    FILE* file;
-    unsigned char header[54];
-    unsigned int dataPos;
-    unsigned int size;
+    unsigned char* buf;
+    FILE* f;
 
-    fopen_s( &file, fileName, "rb" );
+    fopen_s( &f, fileName, "rb" );
+    if ( !f ) {
+        printf( "Error opening the input file.\n" );
+        return;
+    }
+    fseek( f, 0, SEEK_END );
+    auto size = ftell( f );
+    buf = (unsigned char*) malloc( size );
+    fseek( f, 0, SEEK_SET );
+    size_t read = fread( buf, 1, size, f );
+    fclose( f );
 
-    if ( file == NULL ) {
-        //MessageBox(NULL, L"Error: Invaild file path!", L"Error", MB_OK);
+    Jpeg::Decoder decoder( buf, size );
+    if ( decoder.GetResult() != Jpeg::Decoder::OK ) {
+        printf( "Error decoding the input file\n" );
         return;
     }
 
-    if ( fread( header, 1, 54, file ) != 54 ) {
-        //MessageBox(NULL, L"Error: Invaild file!", L"Error", MB_OK);
-        return;
-    }
+    width = decoder.GetWidth();
+    height = decoder.GetHeight();
+    size = decoder.GetImageSize();
 
-    if ( header[0] != 'B' || header[1] != 'M' ) {
-        //MessageBox(NULL, L"Error: Invaild file!", L"Error", MB_OK);
-        return;
-    }
-
-    dataPos = *(int*) &( header[0x0A] );
-    size = *(int*) &( header[0x22] );
-    width = *(int*) &( header[0x12] );
-    height = *(int*) &( header[0x16] );
-
-    if ( size == NULL )
-        size = width * height * 3;
-    if ( dataPos == NULL )
-        dataPos = 54;
-
-    data = new unsigned char[size];
-
-    fread( data, 1, size, file );
-
-    for ( unsigned int i = 0; i < size; i += 3 ) {
-        unsigned char red = data[i];
-        data[i] = data[i + 2];
-        data[i + 2] = red;
-    }
-
-    fclose( file );
+    data = new unsigned char[decoder.GetImageSize()];
+    auto row = size / height;
+    for ( int ptr = 0; ptr < size; ptr += row )
+        memcpy( data + ptr, decoder.GetImage() + size - ptr - row, row );
 }
