@@ -29,24 +29,29 @@ ofbx::IScene* LoadFbx() {
     return g_scene;
 }
 
+struct DrawSurface {
+    ofbx::Color color;
+    Image* texture;
+    const ofbx::Vec3 *vertices;
+    const ofbx::Vec3 *normals;
+    const ofbx::Vec2 *texCoords;
+    std::vector<int> indices;
+};
 
 void DrawFbx() {
-    static auto g_scene = LoadFbx();
-    glPushMatrix();
-    float s = 1e0f;
-    glScalef( s, s, s );
-    for ( int j = 0; j < g_scene->getMeshCount(); j++ ) {
-        auto mesh = g_scene->getMesh( j );
-        auto geometry = mesh->getGeometry();
-        auto texCoords = geometry->getUVs();
-        if ( mesh->getMaterialCount() != 1 ) {
-            printf( "Material count %d\n", mesh->getMaterialCount() );
-        } else {
-            auto material = mesh->getMaterial( 0 );
-            auto c = material->getDiffuseColor();
-            glColor3fv( &c.r );
-            glDisable( GL_TEXTURE_2D );
-            if ( texCoords )
+    static std::vector<DrawSurface> surfaces;
+    if ( surfaces.empty() ) {
+        auto g_scene = LoadFbx();
+        for ( int j = 0; j < g_scene->getMeshCount(); j++ ) {
+            auto mesh = g_scene->getMesh( j );
+            auto geometry = mesh->getGeometry();
+            DrawSurface surface;
+            surface.texture = nullptr;
+            if ( mesh->getMaterialCount() != 1 ) {
+                printf( "Material count %d\n", mesh->getMaterialCount() );
+            } else {
+                auto material = mesh->getMaterial( 0 );
+                surface.color = material->getDiffuseColor();
                 for ( int t = 0; t < ofbx::Texture::TextureType::COUNT; t++ ) {
                     auto tt = ( ofbx::Texture::TextureType )t;
                     if ( material->getTexture( tt ) ) {
@@ -55,31 +60,42 @@ void DrawFbx() {
                         char* s = (char*) _malloca( len + 1 );
                         memcpy( s, fn.begin, len );
                         s[len] = '\0';
-                        glEnable( GL_TEXTURE_2D );
                         auto path = string_format( "..\\assets\\House N210818\\%s", s );
-                        auto texture = Images::get( path );
-                        texture->Bind();
+                        surface.texture = Images::get( path );
+                        break;
                     }
                 }
+            }
+            auto ind = geometry->getFaceIndices();
+            surface.vertices = geometry->getVertices();
+            surface.normals = geometry->getNormals();
+            surface.texCoords = geometry->getUVs();
+            for ( int i = 0; i < geometry->getIndexCount(); i++ ) {
+                int index = ind[i];
+                index = index < 0 ? -index - 1 : index;
+                surface.indices.push_back( index );
+            }
+            surfaces.push_back( surface );
         }
-        auto verts = geometry->getVertices();
-        auto normals = geometry->getNormals();
-        auto ind = geometry->getFaceIndices();
-        glVertexPointer( 3, GL_DOUBLE, 0, verts );
-        glNormalPointer( GL_DOUBLE, 0, normals );
-        if ( texCoords ) {
+    }
+    glPushMatrix();
+    float s = 1e0f;
+    glScalef( s, s, s );
+    for ( size_t j = 0; j < surfaces.size(); j++ ) {
+        auto& surface = surfaces[j];
+        glVertexPointer( 3, GL_DOUBLE, 0, surface.vertices );
+        glNormalPointer( GL_DOUBLE, 0, surface.normals );
+        if ( surface.texCoords && surface.texture ) {
             glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-            glTexCoordPointer( 2, GL_DOUBLE, 0, texCoords );
-        }  else
+            glTexCoordPointer( 2, GL_DOUBLE, 0, surface.texCoords );
+            surface.texture->Bind();
+            glEnable( GL_TEXTURE_2D );
+        } else {
+            glDisable( GL_TEXTURE_2D );
             glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-        glBegin( GL_TRIANGLES );
-        for ( int i = 0; i < geometry->getIndexCount(); i++ ) {
-            int index = ind[i];
-            index = index < 0 ? -index-1 : index;
-            glArrayElement( index );
         }
-        glEnd();
-        //glDrawElements( GL_TRIANGLES, geometry->getIndexCount(), GL_UNSIGNED_INT, ind );
+        glColor3fv( &surface.color.r );
+        glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
     }
     glPopMatrix();
 }
