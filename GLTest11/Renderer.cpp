@@ -43,13 +43,10 @@ struct DrawSurface {
         glVertexPointer( 3, GL_DOUBLE, 0, surface.vertices );
         glNormalPointer( GL_DOUBLE, 0, surface.normals );
         if ( surface.texCoords && surface.texture ) {
-            glEnableClientState( GL_TEXTURE_COORD_ARRAY );
             glTexCoordPointer( 2, GL_DOUBLE, 0, surface.texCoords );
             surface.texture->Bind();
-            glEnable( GL_TEXTURE_2D );
         } else {
-            glDisable( GL_TEXTURE_2D );
-            glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+            Images::Unbind();
         }
         glColor3fv( &surface.color.r );
         glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );

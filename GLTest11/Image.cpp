@@ -21,6 +21,8 @@ void Image::Bind() {
     }
     if ( boundImage == texHandle )
         return;
+    glEnable( GL_TEXTURE_2D );
+    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
     glBindTexture( GL_TEXTURE_2D, boundImage = texHandle );
     Renderer::PC.textureSwitches++;
 }
@@ -35,3 +37,11 @@ void Image::Load( const char* fileName ) {
 }
 
 std::map<std::string, Image> Images::images;
+
+void Images::Unbind() {
+    if ( !boundImage )
+        return;
+    glDisable( GL_TEXTURE_2D );
+    glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+    boundImage = 0;
+}

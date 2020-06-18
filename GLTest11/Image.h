@@ -31,4 +31,6 @@ struct Images {
             return &image;
         }
     }
+
+    static void Unbind();
 };
