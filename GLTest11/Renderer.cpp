@@ -3,6 +3,7 @@
 #include "glad.h"
 #include "ofbx.h"
 #include "Util.h"
+#include "Image.h"
 #include "GLFW/glfw3.h"
 
 bool Renderer::wireframe = false;
@@ -27,13 +28,36 @@ void LoadFbx( int dl ) {
     ofbx::IScene* g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
 
     glNewList( dl, GL_COMPILE );
-    glDisable( GL_TEXTURE_2D );
     glPushMatrix();
     float s = 1e0f;
     glScalef( s, s, s );
     for ( int j = 0; j < g_scene->getMeshCount(); j++ ) {
         auto mesh = g_scene->getMesh( j );
         auto geometry = mesh->getGeometry();
+        auto texCoords = geometry->getUVs();
+        if ( mesh->getMaterialCount() != 1 ) {
+            printf( "Material count %d\n", mesh->getMaterialCount() );
+        } else {
+            auto material = mesh->getMaterial( 0 );
+            auto c = material->getDiffuseColor();
+            glColor3fv( &c.r );
+            glDisable( GL_TEXTURE_2D );
+            if( texCoords )
+            for ( int t = 0; t < ofbx::Texture::TextureType::COUNT; t++ ) {
+                auto tt = ( ofbx::Texture::TextureType )t;
+                if ( material->getTexture( tt ) ) {
+                    auto fn = material->getTexture( tt )->getFileName();
+                    auto len = fn.end - fn.begin;
+                    char* s = (char*) _alloca( len+1 );
+                    memcpy(s, fn.begin, len );
+                    s[len] = '\0';
+                    glEnable( GL_TEXTURE_2D );
+                    auto path = string_format( "..\\assets\\House N210818\\%s", s );
+                    auto texture = Images::get( path );
+                    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture->data );
+                }
+            }
+        }
         auto verts = geometry->getVertices();
         auto normals = geometry->getNormals();
         auto ind = geometry->getFaceIndices();
@@ -43,13 +67,16 @@ void LoadFbx( int dl ) {
             index = index < 0 ? -index : index + 1;
             auto vert = verts[index - 1];
             auto norm = normals[index - 1];
+            if ( texCoords ) {
+                auto texCoord = texCoords[index - 1];
+                glTexCoord2dv( &texCoord.x );
+            }
             glNormal3dv( &norm.x );
             glVertex3dv( &vert.x );
         }
         glEnd();
     }
     glPopMatrix();
-    glEnable( GL_TEXTURE_2D );
     glEndList();
 }
 

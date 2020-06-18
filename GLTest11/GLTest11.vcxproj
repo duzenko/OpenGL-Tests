@@ -143,10 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\nanojpeg.c" />
     <ClCompile Include="..\OpenFBX-master\src\miniz.c" />
     <ClCompile Include="..\OpenFBX-master\src\ofbx.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLTest11.cpp" />
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Simulation.cpp" />
   </ItemGroup>
@@ -155,6 +157,7 @@
     <ClInclude Include="..\OpenFBX-master\src\miniz.h" />
     <ClInclude Include="..\OpenFBX-master\src\ofbx.h" />
     <ClInclude Include="glad.h" />
+    <ClInclude Include="Image.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulation.h" />
   </ItemGroup>
