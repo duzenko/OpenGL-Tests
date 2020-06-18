@@ -4,7 +4,7 @@
 #include <string>
 
 struct Image {
-    unsigned int width = 0, height = 0;
+    int width = 0, height = 0;
     unsigned char* data = nullptr;
     unsigned int texHandle = 0;
     Image() {}

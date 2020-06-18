@@ -143,7 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\nanojpeg.c" />
     <ClCompile Include="..\OpenFBX-master\src\miniz.c" />
     <ClCompile Include="..\OpenFBX-master\src\ofbx.cpp" />
     <ClCompile Include="glad.c" />

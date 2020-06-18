@@ -5,11 +5,11 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>../glfw-3.3.2.bin.WIN32\include;../glm-master;../OpenFBX-master/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../glfw-3.3.2.bin.WIN32\include;../glm-master;../OpenFBX-master/src;../im-3.14_Win32_vc16_lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../glfw-3.3.2.bin.WIN32\lib-vc2019</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;im.lib;zlib1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../glfw-3.3.2.bin.WIN32\lib-vc2019;../im-3.14_Win32_vc16_lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
