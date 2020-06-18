@@ -14,11 +14,11 @@ struct Viewport {
     int x, y, width, height;
 };
 
-void LoadFbx( int dl ) {
+ofbx::IScene* LoadFbx() {
     FILE* fp;
     auto fn = "..\\assets\\House N210818\\House N210818.fbx";
     fopen_s( &fp, fn, "rb" );
-    if ( !fp ) return;
+    if ( !fp ) return nullptr;
 
     fseek( fp, 0, SEEK_END );
     long file_size = ftell( fp );
@@ -26,8 +26,12 @@ void LoadFbx( int dl ) {
     auto* content = new ofbx::u8[file_size];
     fread( content, 1, file_size, fp );
     ofbx::IScene* g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
+    return g_scene;
+}
 
-    glNewList( dl, GL_COMPILE );
+
+void DrawFbx() {
+    static auto g_scene = LoadFbx();
     glPushMatrix();
     float s = 1e0f;
     glScalef( s, s, s );
@@ -42,21 +46,21 @@ void LoadFbx( int dl ) {
             auto c = material->getDiffuseColor();
             glColor3fv( &c.r );
             glDisable( GL_TEXTURE_2D );
-            if( texCoords )
-            for ( int t = 0; t < ofbx::Texture::TextureType::COUNT; t++ ) {
-                auto tt = ( ofbx::Texture::TextureType )t;
-                if ( material->getTexture( tt ) ) {
-                    auto fn = material->getTexture( tt )->getFileName();
-                    auto len = fn.end - fn.begin;
-                    char* s = (char*) _alloca( len+1 );
-                    memcpy(s, fn.begin, len );
-                    s[len] = '\0';
-                    glEnable( GL_TEXTURE_2D );
-                    auto path = string_format( "..\\assets\\House N210818\\%s", s );
-                    auto texture = Images::get( path );
-                    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture->data );
+            if ( texCoords )
+                for ( int t = 0; t < ofbx::Texture::TextureType::COUNT; t++ ) {
+                    auto tt = ( ofbx::Texture::TextureType )t;
+                    if ( material->getTexture( tt ) ) {
+                        auto fn = material->getTexture( tt )->getFileName();
+                        auto len = fn.end - fn.begin;
+                        char* s = (char*) _alloca( len + 1 );
+                        memcpy( s, fn.begin, len );
+                        s[len] = '\0';
+                        glEnable( GL_TEXTURE_2D );
+                        auto path = string_format( "..\\assets\\House N210818\\%s", s );
+                        auto texture = Images::get( path );
+                        texture->Bind();
+                    }
                 }
-            }
         }
         auto verts = geometry->getVertices();
         auto normals = geometry->getNormals();
@@ -77,8 +81,8 @@ void LoadFbx( int dl ) {
         glEnd();
     }
     glPopMatrix();
-    glEndList();
 }
+
 
 Renderer::Renderer() {
     if ( !gladLoadGL() ) {
@@ -105,23 +109,12 @@ Renderer::Renderer() {
     glm::vec4 ambientLight( 0, 0, 0, 1 );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( ambientLight ) );
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
     //glEnable( GL_TEXTURE_2D );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
     glEnable( GL_NORMALIZE );
 }
 
-void DrawFbx() {
-    static int house;
-    if ( !house ) {
-        house = glGenLists( 1 );
-        LoadFbx( house );
-    }
-    glCallList( house );
-}
 
 Renderer::~Renderer() {
 }
