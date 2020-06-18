@@ -12,6 +12,12 @@
 
 #include "Simulation.h"
 
+struct PerformanceCounters {
+    int drawCalls;
+    int drawTriangles;
+    int textureSwitches;
+};
+
 struct Renderer {
     Renderer();
     ~Renderer();
@@ -20,4 +26,6 @@ struct Renderer {
     static bool wireframe;
     static bool culling;
     static float cameraAngle;
+
+    static PerformanceCounters PC;
 };

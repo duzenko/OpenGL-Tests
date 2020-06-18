@@ -5,6 +5,10 @@
 #include "glad.h"
 #include <im.h>
 
+#include "Renderer.h"
+
+int boundImage;
+
 void Image::Bind() {
     if ( !texHandle ) {
         glGenTextures( 1, &texHandle );
@@ -15,7 +19,10 @@ void Image::Bind() {
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
     }
-    glBindTexture( GL_TEXTURE_2D, texHandle );
+    if ( boundImage == texHandle )
+        return;
+    glBindTexture( GL_TEXTURE_2D, boundImage = texHandle );
+    Renderer::PC.textureSwitches++;
 }
 
 void Image::Load( const char* fileName ) {

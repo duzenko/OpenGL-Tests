@@ -9,6 +9,7 @@
 bool Renderer::wireframe = false;
 bool Renderer::culling = true;
 float Renderer::cameraAngle = 0;
+PerformanceCounters Renderer::PC;
 
 struct Viewport {
     int x, y, width, height;
@@ -36,6 +37,25 @@ struct DrawSurface {
     const ofbx::Vec3 *normals;
     const ofbx::Vec2 *texCoords;
     std::vector<int> indices;
+
+    void Draw() {
+        auto& surface = *this;
+        glVertexPointer( 3, GL_DOUBLE, 0, surface.vertices );
+        glNormalPointer( GL_DOUBLE, 0, surface.normals );
+        if ( surface.texCoords && surface.texture ) {
+            glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+            glTexCoordPointer( 2, GL_DOUBLE, 0, surface.texCoords );
+            surface.texture->Bind();
+            glEnable( GL_TEXTURE_2D );
+        } else {
+            glDisable( GL_TEXTURE_2D );
+            glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+        }
+        glColor3fv( &surface.color.r );
+        glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
+        Renderer::PC.drawCalls++;
+        Renderer::PC.drawTriangles += surface.indices.size() / 3;
+    }
 };
 
 void DrawFbx() {
@@ -83,19 +103,7 @@ void DrawFbx() {
     glScalef( s, s, s );
     for ( size_t j = 0; j < surfaces.size(); j++ ) {
         auto& surface = surfaces[j];
-        glVertexPointer( 3, GL_DOUBLE, 0, surface.vertices );
-        glNormalPointer( GL_DOUBLE, 0, surface.normals );
-        if ( surface.texCoords && surface.texture ) {
-            glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-            glTexCoordPointer( 2, GL_DOUBLE, 0, surface.texCoords );
-            surface.texture->Bind();
-            glEnable( GL_TEXTURE_2D );
-        } else {
-            glDisable( GL_TEXTURE_2D );
-            glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-        }
-        glColor3fv( &surface.color.r );
-        glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
+        surface.Draw();
     }
     glPopMatrix();
 }

@@ -3,6 +3,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
+#include<windows.h>
 
 GLFWwindow* window;
 bool swapInterval = false;
@@ -24,6 +25,18 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
         if ( key == GLFW_KEY_RIGHT )
             Renderer::cameraAngle += 1e-2f;
     }
+}
+
+void PrintStats() {
+    auto hnd = GetStdHandle( STD_OUTPUT_HANDLE );
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo( hnd, &csbi );
+    auto &pc = Renderer::PC;
+    printf( "Draw calls: %d\n", pc.drawCalls );
+    printf( "Draw triangles: %d\n", pc.drawTriangles );
+    printf( "Texture switches: %d\n", pc.textureSwitches );
+    SetConsoleCursorPosition( hnd, csbi.dwCursorPosition );
+    memset( &pc, 0, sizeof( pc ) );
 }
 
 int main() {
@@ -53,6 +66,7 @@ int main() {
         renderer.Render( simulation );
         glfwSwapBuffers( window );
         glfwPollEvents();
+        PrintStats();
     }
 
     glfwTerminate();
