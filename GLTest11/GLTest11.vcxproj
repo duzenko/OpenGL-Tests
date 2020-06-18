@@ -143,6 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\OpenFBX-master\src\miniz.c" />
+    <ClCompile Include="..\OpenFBX-master\src\ofbx.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLTest11.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -150,6 +152,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\GLTest10\Util.h" />
+    <ClInclude Include="..\OpenFBX-master\src\miniz.h" />
+    <ClInclude Include="..\OpenFBX-master\src\ofbx.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulation.h" />

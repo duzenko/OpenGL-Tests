@@ -13,6 +13,46 @@ struct Viewport {
     int x, y, width, height;
 };
 
+void LoadFbx( int dl ) {
+    FILE* fp;
+    auto fn = "..\\assets\\House N210818\\House N210818.fbx";
+    fopen_s( &fp, fn, "rb" );
+    if ( !fp ) return;
+
+    fseek( fp, 0, SEEK_END );
+    long file_size = ftell( fp );
+    fseek( fp, 0, SEEK_SET );
+    auto* content = new ofbx::u8[file_size];
+    fread( content, 1, file_size, fp );
+    ofbx::IScene* g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
+
+    glNewList( dl, GL_COMPILE );
+    glDisable( GL_TEXTURE_2D );
+    glPushMatrix();
+    float s = 1e0f;
+    glScalef( s, s, s );
+    for ( int j = 0; j < g_scene->getMeshCount(); j++ ) {
+        auto mesh = g_scene->getMesh( j );
+        auto geometry = mesh->getGeometry();
+        auto verts = geometry->getVertices();
+        auto normals = geometry->getNormals();
+        auto ind = geometry->getFaceIndices();
+        glBegin( GL_TRIANGLES );
+        for ( int i = 0; i < geometry->getIndexCount(); i++ ) {
+            int index = ind[i];
+            index = index < 0 ? -index : index + 1;
+            auto vert = verts[index - 1];
+            auto norm = normals[index - 1];
+            glNormal3dv( &norm.x );
+            glVertex3dv( &vert.x );
+        }
+        glEnd();
+    }
+    glPopMatrix();
+    glEnable( GL_TEXTURE_2D );
+    glEndList();
+}
+
 Renderer::Renderer() {
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
@@ -27,7 +67,7 @@ Renderer::Renderer() {
     Viewport viewport;
     glGetIntegerv( GL_VIEWPORT, (int*)&viewport );
 
-    auto matProj = glm::infinitePerspective( glm::radians( 5.0f ), (float) viewport.width / viewport.height, 11.f );
+    auto matProj = glm::infinitePerspective( glm::radians( 45.0f ), (float) viewport.width / viewport.height, 11.f );
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr( matProj ) );
     glMatrixMode( GL_MODELVIEW );
@@ -41,14 +81,39 @@ Renderer::Renderer() {
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-    glEnable( GL_TEXTURE_2D );
+    //glEnable( GL_TEXTURE_2D );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
     glEnable( GL_NORMALIZE );
+}
+
+void DrawFbx() {
+    static int house;
+    if ( !house ) {
+        house = glGenLists( 1 );
+        LoadFbx( house );
+    }
+    glCallList( house );
 }
 
 Renderer::~Renderer() {
 }
 
 void Renderer::Render( Simulation& simulation ) {
+    glm::mat4 view;
+    view = glm::lookAt( glm::vec3( 0.0f, 0.0f, 233.0f ),
+        glm::vec3( 0.0f, 0.0f, 0.0f ),
+        glm::vec3( 0.0f, 1.0f, 0.0f ) );
+    view = glm::rotate( view, cameraAngle, glm::vec3( 0, 1, 0 ) );
+    glLoadMatrixf( glm::value_ptr( view ) );
+
+    glPolygonMode( GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL );
+    if ( culling )
+        glEnable( GL_CULL_FACE );
+    else
+        glDisable( GL_CULL_FACE );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    DrawFbx();
 }
