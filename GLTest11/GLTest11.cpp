@@ -5,7 +5,7 @@
 #include "GLFW/glfw3.h"
 
 GLFWwindow* window;
-bool swapInterval = true;
+bool swapInterval = false;
 
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
     if ( action == GLFW_PRESS ) {
@@ -32,7 +32,7 @@ int main() {
 
     glfwWindowHint( GLFW_MAXIMIZED, GLFW_TRUE );
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 1 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 0 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 1 );
     window = glfwCreateWindow( 1280, 800, "OpenGL 1.1", NULL, NULL );
     if ( !window ) {
         glfwTerminate();

@@ -52,7 +52,7 @@ void DrawFbx() {
                     if ( material->getTexture( tt ) ) {
                         auto fn = material->getTexture( tt )->getFileName();
                         auto len = fn.end - fn.begin;
-                        char* s = (char*) _alloca( len + 1 );
+                        char* s = (char*) _malloca( len + 1 );
                         memcpy( s, fn.begin, len );
                         s[len] = '\0';
                         glEnable( GL_TEXTURE_2D );
@@ -65,20 +65,21 @@ void DrawFbx() {
         auto verts = geometry->getVertices();
         auto normals = geometry->getNormals();
         auto ind = geometry->getFaceIndices();
+        glVertexPointer( 3, GL_DOUBLE, 0, verts );
+        glNormalPointer( GL_DOUBLE, 0, normals );
+        if ( texCoords ) {
+            glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+            glTexCoordPointer( 2, GL_DOUBLE, 0, texCoords );
+        }  else
+            glDisableClientState( GL_TEXTURE_COORD_ARRAY );
         glBegin( GL_TRIANGLES );
         for ( int i = 0; i < geometry->getIndexCount(); i++ ) {
             int index = ind[i];
-            index = index < 0 ? -index : index + 1;
-            auto vert = verts[index - 1];
-            auto norm = normals[index - 1];
-            if ( texCoords ) {
-                auto texCoord = texCoords[index - 1];
-                glTexCoord2dv( &texCoord.x );
-            }
-            glNormal3dv( &norm.x );
-            glVertex3dv( &vert.x );
+            index = index < 0 ? -index-1 : index;
+            glArrayElement( index );
         }
         glEnd();
+        //glDrawElements( GL_TRIANGLES, geometry->getIndexCount(), GL_UNSIGNED_INT, ind );
     }
     glPopMatrix();
 }
@@ -113,6 +114,8 @@ Renderer::Renderer() {
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
     glEnable( GL_NORMALIZE );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    glEnableClientState( GL_NORMAL_ARRAY );
 }
 
 

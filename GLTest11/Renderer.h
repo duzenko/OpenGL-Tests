@@ -17,8 +17,6 @@ struct Renderer {
     ~Renderer();
     void Render(Simulation &simulation );
 
-    int dlHouse;
-
     static bool wireframe;
     static bool culling;
     static float cameraAngle;
