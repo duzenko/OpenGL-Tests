@@ -11,6 +11,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "Simulation.h"
+#include "RenderModel.h"
 
 struct PerformanceCounters {
     int drawCalls;
@@ -19,6 +20,9 @@ struct PerformanceCounters {
 };
 
 struct Renderer {
+    RenderModel house;
+    TerrainModel terrain;
+
     Renderer();
     ~Renderer();
     void Render(Simulation &simulation );

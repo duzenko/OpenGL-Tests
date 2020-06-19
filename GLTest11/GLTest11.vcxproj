@@ -149,6 +149,7 @@
     <ClCompile Include="GLTest11.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderModel.cpp" />
     <ClCompile Include="Simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +159,7 @@
     <ClInclude Include="glad.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderModel.h" />
     <ClInclude Include="Simulation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
