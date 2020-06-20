@@ -9,7 +9,11 @@
 void DrawSurface::Draw() {
     auto& surface = *this;
     glVertexPointer( 3, GL_DOUBLE, 0, surface.vertices );
-    glNormalPointer( GL_DOUBLE, 0, surface.normals );
+    if ( surface.normals ) {
+        glEnableClientState( GL_NORMAL_ARRAY );
+        glNormalPointer( GL_DOUBLE, 0, surface.normals );
+    } else
+        glDisableClientState( GL_NORMAL_ARRAY );
     if ( surface.texCoords && surface.texture ) {
         glTexCoordPointer( 2, GL_DOUBLE, 0, surface.texCoords );
         surface.texture->Bind();
@@ -24,7 +28,8 @@ void DrawSurface::Draw() {
 
 void RenderModel::LoadFbx() {
     FILE* fp;
-    auto fn = "..\\assets\\House N210818\\House N210818.fbx";
+    //auto fn = "..\\assets\\House N210818\\House N210818.fbx";
+    auto fn = "..\\assets\\House 2 N220518\\House 2 N220518.fbx";
     fopen_s( &fp, fn, "rb" );
     if ( !fp ) return;
 
@@ -34,6 +39,7 @@ void RenderModel::LoadFbx() {
     auto* content = new ofbx::u8[file_size];
     fread( content, 1, file_size, fp );
     ofbx::IScene* g_scene = ofbx::load( ( ofbx::u8* )content, file_size, ( ofbx::u64 )ofbx::LoadFlags::TRIANGULATE );
+    surfaces.reserve( g_scene->getMeshCount() );
     for ( int j = 0; j < g_scene->getMeshCount(); j++ ) {
         auto mesh = g_scene->getMesh( j );
         auto geometry = mesh->getGeometry();
@@ -80,8 +86,7 @@ void RenderModel::Draw() {
     glPushMatrix();
     float s = scale;
     glScalef( s, s, s );
-    for ( size_t j = 0; j < surfaces.size(); j++ ) {
-        auto& surface = surfaces[j];
+    for ( auto & surface : surfaces ) {
         surface.Draw();
     }
     glPopMatrix();

@@ -43,7 +43,6 @@ Renderer::Renderer() {
     glDepthFunc( GL_LEQUAL );
     glEnable( GL_NORMALIZE );
     glEnableClientState( GL_VERTEX_ARRAY );
-    glEnableClientState( GL_NORMAL_ARRAY );
     house.Load();
 }
 
@@ -67,6 +66,6 @@ void Renderer::Render( Simulation& simulation ) {
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    terrain.Draw();
+    //terrain.Draw();
     house.Draw();
 }
