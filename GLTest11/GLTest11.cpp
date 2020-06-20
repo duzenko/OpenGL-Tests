@@ -1,5 +1,14 @@
+#include <glm/ext/matrix_float4x4.hpp> 
+#include <glm/ext/matrix_clip_space.hpp> 
+#include <glm/trigonometric.hpp> 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/random.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/transform.hpp>
+
 #include "Simulation.h"
 #include "Renderer.h"
+#include "RenderModel.h"
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
@@ -32,10 +41,12 @@ void PrintStats() {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo( hnd, &csbi );
     auto &pc = Renderer::PC;
+    csbi.dwCursorPosition.Y -= 4;
+    SetConsoleCursorPosition( hnd, csbi.dwCursorPosition );
+    printf( "\n" );
     printf( "Draw calls: %d\n", pc.drawCalls );
     printf( "Draw triangles: %d\n", pc.drawTriangles );
     printf( "Texture switches: %d\n", pc.textureSwitches );
-    SetConsoleCursorPosition( hnd, csbi.dwCursorPosition );
     memset( &pc, 0, sizeof( pc ) );
 }
 

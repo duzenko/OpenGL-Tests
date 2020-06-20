@@ -43,7 +43,11 @@ Renderer::Renderer() {
     glDepthFunc( GL_LEQUAL );
     glEnable( GL_NORMALIZE );
     glEnableClientState( GL_VERTEX_ARRAY );
-    house.Load();
+    house.Load( "..\\assets\\House N210818\\House N210818.fbx" );
+    house.modelMatrix = glm::translate( glm::vec3( -1e2, 0, 0 ) );
+    house2.Load( "..\\assets\\Farmhouse Maya 2016 Updated\\farmhouse_fbx.fbx" );
+    auto s = 3;
+    house2.modelMatrix = glm::translate( glm::vec3( 1e2, 0, 0 ) ) * glm::scale( glm::vec3( s, s, s ) );
 }
 
 
@@ -66,6 +70,7 @@ void Renderer::Render( Simulation& simulation ) {
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    //terrain.Draw();
+    terrain.Draw();
     house.Draw();
+    house2.Draw();
 }

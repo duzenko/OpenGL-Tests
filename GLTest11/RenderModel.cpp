@@ -1,6 +1,7 @@
 #include "RenderModel.h"
 
 #include <thread>
+#include <glm/mat4x4.hpp>
 
 #include "glad.h"
 #include "Renderer.h"
@@ -27,13 +28,12 @@ void DrawSurface::Draw() {
     Renderer::PC.drawTriangles += indices.size() / 3;
 }
 
-void RenderModel::LoadFbx() {
+void RenderModel::LoadFbx( char* fileName ) {
+    std::filesystem::path fnPath( fileName );
     FILE* fp;
-    //auto fn = "..\\assets\\House N210818\\House N210818.fbx";
-    auto fn = "..\\assets\\Farmhouse Maya 2016 Updated\\farmhouse_fbx.fbx";
-    fopen_s( &fp, fn, "rb" );
+    //auto fn = ;
+    fopen_s( &fp, fileName, "rb" );
     if ( !fp ) return;
-
     fseek( fp, 0, SEEK_END );
     long file_size = ftell( fp );
     fseek( fp, 0, SEEK_SET );
@@ -60,8 +60,8 @@ void RenderModel::LoadFbx() {
                     memcpy( s, fn.begin, len );
                     s[len] = '\0';
                     std::filesystem::path full( s ); // Construct the path from a string.
-                    //auto path = string_format( "..\\assets\\House N210818\\%s", full.filename().string().c_str() );
-                    auto path = string_format( "..\\assets\\Farmhouse Maya 2016 Updated\\%s", full.filename().string().c_str() );
+                    auto path = string_format( "%s\\%s", 
+                        fnPath.parent_path().string().c_str(), full.filename().string().c_str() );
                     surface.texture = Images::get( path );
                     break;
                 }
@@ -80,15 +80,14 @@ void RenderModel::LoadFbx() {
     }
 }
 
-void RenderModel::Load() {
-    std::thread t1( &RenderModel::LoadFbx, this );
+void RenderModel::Load(char *fileName) {
+    std::thread t1( &RenderModel::LoadFbx, this, fileName );
     t1.detach();
 }
 
 void RenderModel::Draw() {
     glPushMatrix();
-    float s = scale;
-    glScalef( s, s, s );
+    glMultMatrixf( glm::value_ptr( modelMatrix ) );
     for ( auto & surface : surfaces ) {
         surface.Draw();
     }

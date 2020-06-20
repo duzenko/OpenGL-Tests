@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/ext/matrix_float4x4.hpp> 
+#include <glm/gtx/transform.hpp> 
 #include "ofbx.h"
 #include "Image.h"
 #include <vector>
@@ -16,11 +18,12 @@ struct DrawSurface {
 };
 
 struct RenderModel {
-    float scale = 1;
+    glm::mat4 modelMatrix;
     std::vector<DrawSurface> surfaces;
 
-    void Load();
-    void LoadFbx();
+    RenderModel() :modelMatrix( 1 ) {};
+    void Load( char* fileName );
+    void LoadFbx( char* fileName );
     void Draw();
 };
 
@@ -42,6 +45,6 @@ struct TerrainModel: RenderModel {
         surface.indices = { 0, 1, 2, 1, 3, 2 };
         surface.color = { 0, .3f, 0 };
         surfaces.push_back( surface );
-        scale = 1e3;
+        modelMatrix = glm::scale( glm::vec3( 1e3, 1e3, 1e3 ) );
     }
 };
