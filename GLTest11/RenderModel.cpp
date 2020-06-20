@@ -5,6 +5,7 @@
 #include "glad.h"
 #include "Renderer.h"
 #include "Util.h"
+#include <filesystem> // C++17 (or Microsoft-specific implementation in C++14)
 
 void DrawSurface::Draw() {
     auto& surface = *this;
@@ -29,7 +30,7 @@ void DrawSurface::Draw() {
 void RenderModel::LoadFbx() {
     FILE* fp;
     //auto fn = "..\\assets\\House N210818\\House N210818.fbx";
-    auto fn = "..\\assets\\House 2 N220518\\House 2 N220518.fbx";
+    auto fn = "..\\assets\\Farmhouse Maya 2016 Updated\\farmhouse_fbx.fbx";
     fopen_s( &fp, fn, "rb" );
     if ( !fp ) return;
 
@@ -58,7 +59,9 @@ void RenderModel::LoadFbx() {
                     char* s = (char*) _malloca( len + 1 );
                     memcpy( s, fn.begin, len );
                     s[len] = '\0';
-                    auto path = string_format( "..\\assets\\House N210818\\%s", s );
+                    std::filesystem::path full( s ); // Construct the path from a string.
+                    //auto path = string_format( "..\\assets\\House N210818\\%s", full.filename().string().c_str() );
+                    auto path = string_format( "..\\assets\\Farmhouse Maya 2016 Updated\\%s", full.filename().string().c_str() );
                     surface.texture = Images::get( path );
                     break;
                 }
