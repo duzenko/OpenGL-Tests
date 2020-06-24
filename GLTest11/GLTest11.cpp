@@ -15,7 +15,7 @@
 #include<windows.h>
 
 GLFWwindow* window;
-bool swapInterval = false;
+bool swapInterval = true;
 
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
     if ( action == GLFW_PRESS ) {
@@ -84,6 +84,6 @@ int main() {
 }
 
 extern "C" {
-    //__declspec( dllexport ) int NvOptimusEnablement = 0x00000001;
-    //__declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
+    __declspec( dllexport ) int NvOptimusEnablement = 0x00000001;
+    __declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
 }

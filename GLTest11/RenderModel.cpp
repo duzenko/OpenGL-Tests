@@ -23,6 +23,7 @@ void DrawSurface::Draw() {
         Images::Unbind();
     }
     glColor3fv( &surface.color.r );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &surface.color.r );
     glDrawElements( GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data() );
     Renderer::PC.drawCalls++;
     Renderer::PC.drawTriangles += indices.size() / 3;
