@@ -15,12 +15,14 @@
 
 struct Simulation {
     std::vector<CubeModel> blocks;
+    glm::vec3 lightPosition;
 
     Simulation() {
         blocks.resize( 16 );
     }
 
     void Update( double newTime ) {
+        lightPosition = glm::rotate( glm::vec3( 0, 0, 1 ), -(float)newTime*.5f, glm::vec3( -2, 1, 0 ) );
     }
 };
 

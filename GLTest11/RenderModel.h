@@ -42,7 +42,7 @@ struct TerrainModel: RenderModel {
             {0, 1, 0},
         };
         surface.indices = { 0, 1, 2, 1, 3, 2 };
-        surface.color = { 0, 1.3f, 0 };
+        surface.color = { 0, 0.3f, 0 };
         surfaces.push_back( surface );
         modelMatrix = glm::scale( glm::vec3( 1e3, 1e3, 1e3 ) );
     }

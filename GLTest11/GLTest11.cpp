@@ -48,7 +48,7 @@ void PrintStats() {
     printf( "\n" );
     printf( "Draw calls: %d\n", pc.drawCalls );
     printf( "Draw triangles: %d\n", pc.drawTriangles );
-    printf( "Texture switches: %d\n", pc.textureSwitches );
+    //printf( "Texture switches: %d\n", pc.textureSwitches );
     memset( &pc, 0, sizeof( pc ) );
 }
 
@@ -80,6 +80,7 @@ int main() {
         glfwSwapBuffers( window );
         glfwPollEvents();
         PrintStats();
+        printf( "%f\n", simulation.lightPosition.y );
     }
 
     glfwTerminate();
