@@ -20,8 +20,6 @@ struct PerformanceCounters {
 };
 
 struct Renderer {
-    RenderModel house;
-    RenderModel house2;
     TerrainModel terrain;
 
     Renderer();

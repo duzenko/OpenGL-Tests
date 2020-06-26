@@ -11,8 +11,13 @@
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+#include "RenderModel.h"
+
 struct Simulation {
+    std::vector<CubeModel> blocks;
+
     Simulation() {
+        blocks.resize( 16 );
     }
 
     void Update( double newTime ) {

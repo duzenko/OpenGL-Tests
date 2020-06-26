@@ -2,6 +2,9 @@
 
 #include <cstdio>
 #include <cstring>
+#include <thread>
+#include <mutex>          // std::mutex, std::unique_lock, std::defer_lock
+
 #include "glad.h"
 #include <im.h>
 
@@ -10,6 +13,15 @@
 int boundImage;
 
 void Image::Bind() {
+    if ( state == Empty ) {
+        state = Loading;
+        std::thread thread( &Image::Load, this );
+        thread.detach();
+    }
+    if ( state != Loaded ) {
+        Images::Unbind();
+        return;
+    }
     if ( !texHandle ) {
         glGenTextures( 1, &texHandle );
         printf( "Load texHandle %d\n", texHandle );
@@ -17,7 +29,7 @@ void Image::Bind() {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data.data() );
     }
     if ( boundImage == texHandle )
         return;
@@ -27,16 +39,22 @@ void Image::Bind() {
     Renderer::PC.textureSwitches++;
 }
 
-void Image::Load( const char* fileName ) {
+std::mutex mtx;           // mutex for critical section
+
+void Image::Load() {
+    std::unique_lock<std::mutex> lck( mtx, std::defer_lock );
+    lck.lock();
     int error;
-    auto f = imFileOpen( fileName , &error);
+    auto f = imFileOpen( fileName.c_str(), &error);
     int cm, dt;
     imFileReadImageInfo( f, 0, &width, &height, &cm, &dt );
-    data = new unsigned char[3 * width * height];
-    imFileReadImageData( f, data, 1, IM_PACKED );
+    data.reserve(3 * width * height);
+    imFileReadImageData( f, data.data(), 1, IM_PACKED );
+    state = Loaded;
+    lck.unlock();
 }
 
-std::map<std::string, Image> Images::images;
+std::vector<Image> Images::images;
 
 void Images::Unbind() {
     if ( !boundImage )
