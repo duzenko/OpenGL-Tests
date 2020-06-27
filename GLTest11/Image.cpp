@@ -1,14 +1,4 @@
-#include "Image.h"
-
-#include <cstdio>
-#include <cstring>
-#include <thread>
-#include <mutex>          // std::mutex, std::unique_lock, std::defer_lock
-
-#include "glad.h"
-#include <im.h>
-
-#include "Renderer.h"
+#include "stdafx.h"
 
 int boundImage;
 

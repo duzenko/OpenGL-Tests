@@ -1,12 +1,4 @@
-#include "RenderModel.h"
-
-#include <thread>
-#include <glm/mat4x4.hpp>
-
-#include "glad.h"
-#include "Renderer.h"
-#include "Util.h"
-#include <filesystem> // C++17 (or Microsoft-specific implementation in C++14)
+#include "stdafx.h"
 
 void DrawSurface::Draw() {
     auto& surface = *this;
@@ -22,8 +14,8 @@ void DrawSurface::Draw() {
     } else {
         Images::Unbind();
     }
-    glColor3fv( &surface.color.r );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &surface.color.r );
+    glColor3fv( &surface.color.x );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &surface.color.x );
     glDrawElements( GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data() );
     Renderer::PC.drawCalls++;
     Renderer::PC.drawTriangles += indices.size() / 3;

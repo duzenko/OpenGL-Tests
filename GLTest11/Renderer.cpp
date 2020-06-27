@@ -1,11 +1,4 @@
-﻿#include "Renderer.h"
-
-#include <filesystem> // C++17 (or Microsoft-specific implementation in C++14)
-
-#include "glad.h"
-#include "Util.h"
-#include "Image.h"
-#include "GLFW/glfw3.h"
+﻿#include "stdafx.h"
 
 bool Renderer::wireframe = false;
 bool Renderer::culling = true;

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="fbx">
-      <UniqueIdentifier>{260b8c21-fe0b-4ab6-8920-6b512e4a3793}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLTest11.cpp">
@@ -29,12 +26,6 @@
     </ClCompile>
     <ClCompile Include="Simulation.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OpenFBX-master\src\miniz.c">
-      <Filter>fbx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OpenFBX-master\src\ofbx.cpp">
-      <Filter>fbx</Filter>
     </ClCompile>
     <ClCompile Include="Image.cpp">
       <Filter>Source Files</Filter>
@@ -56,16 +47,13 @@
     <ClInclude Include="glad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\OpenFBX-master\src\miniz.h">
-      <Filter>fbx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\OpenFBX-master\src\ofbx.h">
-      <Filter>fbx</Filter>
-    </ClInclude>
     <ClInclude Include="Image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

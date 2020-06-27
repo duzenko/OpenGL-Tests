@@ -15,10 +15,10 @@
 
 struct Simulation {
     std::vector<CubeModel> blocks;
-    glm::vec3 lightPosition;
+    glm::vec3 lightPosition = { 0, 0, 1 };
 
     Simulation() {
-        blocks.resize( 16 );
+        blocks.resize( 32 );
     }
 
     void Update( double newTime ) {
