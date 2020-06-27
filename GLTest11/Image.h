@@ -5,16 +5,17 @@
 #include <vector>
 
 struct Image {
-    enum {
+    enum class State {
         Empty, Loading, Loaded
-    } state = Empty;
+    };
+    State state = State::Empty;
 
     int width = 0, height = 0;
     std::string fileName;
     std::vector<char> data;
     unsigned int texHandle = 0;
 
-    Image( const std::string& fileName ) :fileName( fileName ) {}
+    Image() {}
     ~Image() {}
     void Bind();
 private:
@@ -22,16 +23,18 @@ private:
 };
 
 struct Images {
-    static std::vector<Image> images;
+    static std::list<Image> images;
 
     static Image* get(const std::string &fileName) {
         for ( auto& image : images ) {
             if ( image.fileName == fileName )
                 return &image;
         }
-        Image image( fileName );
-        auto it = images.insert(images.end(), image );
-        return it._Ptr;
+        int idx = images.size();
+        images.resize( idx + 1 );
+        auto& image = images.back();
+        image.fileName = fileName;
+        return &image;
     }
 
     static void Unbind();

@@ -22,19 +22,21 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
     }
 }
 
-void PrintStats() {
+/*void PrintStats() {
     auto hnd = GetStdHandle( STD_OUTPUT_HANDLE );
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo( hnd, &csbi );
     auto &pc = Renderer::PC;
     csbi.dwCursorPosition.Y -= 4;
-    SetConsoleCursorPosition( hnd, csbi.dwCursorPosition );
+    COORD sc = { csbi.srWindow.Right / 2, 0 };
+    SetConsoleCursorPosition( hnd, sc );
     printf( "\n" );
     printf( "Draw calls: %d\n", pc.drawCalls );
     printf( "Draw triangles: %d\n", pc.drawTriangles );
-    //printf( "Texture switches: %d\n", pc.textureSwitches );
+    printf( "Texture switches: %d\n", pc.textureSwitches );
+    SetConsoleCursorPosition( hnd, csbi.dwCursorPosition );
     memset( &pc, 0, sizeof( pc ) );
-}
+}*/
 
 int main() {
     if ( !glfwInit() )
@@ -63,8 +65,7 @@ int main() {
         renderer.Render( simulation );
         glfwSwapBuffers( window );
         glfwPollEvents();
-        PrintStats();
-        printf( "%f\n", simulation.lightPosition.y );
+        //PrintStats();
     }
 
     glfwTerminate();

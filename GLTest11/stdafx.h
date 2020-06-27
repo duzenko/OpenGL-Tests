@@ -8,7 +8,7 @@
 #include <mutex>         
 #include <thread>
 
-#include <windows.h>
+//#include <windows.h>
 
 #include <glm/ext/matrix_float4x4.hpp> 
 #include <glm/ext/matrix_clip_space.hpp> 
@@ -23,8 +23,8 @@
 #include "GLFW/glfw3.h"
 #include "glad.h"
 
+#include "Image.h"
+#include "RenderModel.h"
 
 #include "Simulation.h"
-#include "Image.h"
 #include "Renderer.h"
-#include "RenderModel.h"

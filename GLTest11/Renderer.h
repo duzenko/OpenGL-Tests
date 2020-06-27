@@ -31,4 +31,9 @@ struct Renderer {
     static float cameraAngle;
 
     static PerformanceCounters PC;
+
+private:
+    void ListSurfaces( Simulation& simulation );
+    void ShadowPass();
+    void LightPass();
 };

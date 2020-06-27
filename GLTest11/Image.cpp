@@ -3,12 +3,12 @@
 int boundImage;
 
 void Image::Bind() {
-    if ( state == Empty ) {
-        state = Loading;
+    if ( state == State::Empty ) {
+        state = State::Loading;
         std::thread thread( &Image::Load, this );
         thread.detach();
     }
-    if ( state != Loaded ) {
+    if ( state != State::Loaded ) {
         Images::Unbind();
         return;
     }
@@ -40,11 +40,11 @@ void Image::Load() {
     imFileReadImageInfo( f, 0, &width, &height, &cm, &dt );
     data.reserve(3 * width * height);
     imFileReadImageData( f, data.data(), 1, IM_PACKED );
-    state = Loaded;
+    state = State::Loaded;
     lck.unlock();
 }
 
-std::vector<Image> Images::images;
+std::list<Image> Images::images;
 
 void Images::Unbind() {
     if ( !boundImage )
