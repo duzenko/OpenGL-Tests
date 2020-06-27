@@ -39,6 +39,7 @@ Renderer::Renderer() {
     glEnable( GL_NORMALIZE );
     glEnable( GL_LIGHTING );
     glEnableClientState( GL_VERTEX_ARRAY );
+    glEnable( GL_STENCIL_TEST );
 }
 
 
@@ -107,6 +108,38 @@ void R_DrawSurface(DrawSurface &surface) {
     glPopMatrix();
 }
 
+void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec4& lightPosition ) {
+    //glMultMatrixf( glm::value_ptr( surface.model->modelMatrix ) );
+    glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
+    glDisableClientState( GL_NORMAL_ARRAY );
+    Images::Unbind();
+    glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
+    std::vector<int> triInd;
+    for ( auto index : surface.indices ) {
+        triInd.push_back( index );
+        if ( triInd.size() != 3 )
+            continue;
+        for ( int edgeInd = 0; edgeInd < 3; edgeInd++ ) {
+            int i1 = edgeInd;
+            int i2 = (edgeInd + 1) % 3;
+            auto v1 = surface.model->modelMatrix * glm::vec4( surface.vertices[triInd[i1]], 1 );
+            auto v2 = surface.model->modelMatrix * glm::vec4( surface.vertices[triInd[i2]], 1 );
+            auto v3 = v1 * 2.f - lightPosition;
+            auto v4 = v2 * 2.f - lightPosition;
+            glBegin( GL_QUADS );
+            glVertex3fv( glm::value_ptr( v1 ) );
+            glVertex3fv( glm::value_ptr( v2 ) );
+            glVertex3fv( glm::value_ptr( v3 ) );
+            glVertex3fv( glm::value_ptr( v4 ) );
+            glEnd();
+        }
+        triInd.clear();
+    }
+    
+    Renderer::PC.drawCalls++;
+    Renderer::PC.drawTriangles += surface.indices.size() / 3;
+}
+
 void Renderer::AmbientPass() {
     glBlendFunc( GL_ONE, GL_ZERO );
     glDepthMask( GL_TRUE );
@@ -117,7 +150,6 @@ void Renderer::AmbientPass() {
     glm::vec3 color0( 0 );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color0 ) );
     glDepthMask( GL_FALSE );
-    glBlendFunc( GL_ONE, GL_ONE );
 }
 
 void Renderer::ShadowPass( glm::vec4& lightPosition ) {
@@ -125,18 +157,19 @@ void Renderer::ShadowPass( glm::vec4& lightPosition ) {
     glStencilOp( GL_KEEP, GL_KEEP, GL_INCR );
     for ( auto s : drawSurfaces )
         if ( s->texture )
-            R_DrawSurface( *s );
+            R_DrawSurfaceShadow( *s, lightPosition );
+    glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
     glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 }
 
 void Renderer::LightPass( glm::vec4& lightPosition ) {
+    glBlendFunc( GL_ONE, GL_ONE );
     glEnable( GL_LIGHT0 );
     glLightfv( GL_LIGHT0, GL_POSITION, glm::value_ptr( lightPosition ) );
 
-    //glEnable( GL_STENCIL_TEST );
-    glStencilFunc(GL_GREATER, 0, 255);
+    glStencilFunc( GL_EQUAL, 0, 255 );
     for ( auto s : drawSurfaces )
         R_DrawSurface( *s );
-    glDisable( GL_STENCIL_TEST );
+    glStencilFunc( GL_ALWAYS, 0, 255 );
     glDisable( GL_LIGHT0 );
 }
