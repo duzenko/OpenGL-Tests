@@ -158,16 +158,18 @@ void Renderer::AmbientPass() {
 
 void Renderer::ShadowPass( glm::vec3& lightPosition ) {
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-    glCullFace( GL_FRONT );
-    glStencilOp( GL_KEEP, GL_KEEP, GL_INCR );
+    glPushAttrib( GL_ENABLE_BIT );
+    glDisable( GL_CULL_FACE );
+    glStencilOp( GL_KEEP, GL_KEEP, GL_INVERT );
     for ( auto s : drawSurfaces )
         if ( s->texture )
             R_DrawSurfaceShadow( *s, lightPosition );
-    glCullFace( GL_BACK );
+    /*glCullFace( GL_BACK );
     glStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
     for ( auto s : drawSurfaces )
         if ( s->texture )
-            R_DrawSurfaceShadow( *s, lightPosition );
+            R_DrawSurfaceShadow( *s, lightPosition );*/
+    glPopAttrib();
     glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
     glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
     glCullFace( GL_BACK );

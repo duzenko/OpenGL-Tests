@@ -15,7 +15,7 @@ struct SurfaceTriangle {
     }
 
     glm::vec3 Normal() {
-        return glm::cross( b-a, c-a );
+        return glm::normalize( glm::cross( b-a, c-a ) );
     }
 
     bool Contains( glm::vec3& v ) {

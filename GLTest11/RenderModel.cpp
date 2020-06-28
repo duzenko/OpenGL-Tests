@@ -31,7 +31,7 @@ void DrawSurface::BuildEdges() {
             edge.v2 = found[1];
             edge.n1 = t1.Normal();
             edge.n2 = t2.Normal();
-            if ( glm::normalize( edge.n1 ) == glm::normalize( edge.n2 ) )
+            if ( edge.n1 == edge.n2 )
                 continue; // rect halves
             edges.push_back( edge );
         }
@@ -40,7 +40,7 @@ void DrawSurface::BuildEdges() {
 
 CubeModel::CubeModel() {
     name = "cube #XX";
-    modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -15, 15 ), 1, glm::linearRand( -5, 5 ) ) );
+    modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -15, 15 ), 1, glm::linearRand( -5, 25 ) ) );
     drawBox();
     auto& surface = surfaces[0];
     if ( randomTextures.empty() )
