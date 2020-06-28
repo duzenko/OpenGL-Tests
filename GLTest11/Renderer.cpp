@@ -110,12 +110,11 @@ void R_DrawSurface(DrawSurface &surface) {
     glPopMatrix();
 }
 
+bool shbf = true;
 void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
-    //glMultMatrixf( glm::value_ptr( surface.model->modelMatrix ) );
     glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
     glDisableClientState( GL_NORMAL_ARRAY );
     Images::Unbind();
-    glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
     std::vector<int> triInd;
     for ( auto& edge : surface.edges ) {
         auto v1w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.v1, 1 ) );
@@ -126,17 +125,20 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
         auto d2 = glm::dot( n2w, v2l );
         if ( d1 * d2 >= 0 )
             continue; // not a silhouette edge
-        for ( int edgeInd = 0; edgeInd < 3; edgeInd++ ) {
-            auto v2w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.v2, 1 ) );
-            auto v3 = v1w * 2.f - lightPosition;
-            auto v4 = v2w * 2.f - lightPosition;
-            glBegin( GL_TRIANGLE_STRIP );
-            glVertex3fv( glm::value_ptr( v1w ) );
-            glVertex3fv( glm::value_ptr( v2w ) );
-            glVertex3fv( glm::value_ptr( v3 ) );
-            glVertex3fv( glm::value_ptr( v4 ) );
-            glEnd();
-        }
+        auto backFace = d1 > 0;
+        if ( backFace )
+            ;// return;
+        auto v2w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.v2, 1 ) );
+        auto v1 = backFace ? v1w : v2w;
+        auto v2 = backFace ? v2w : v1w;
+        auto v3 = v1 * 2.f - lightPosition;
+        auto v4 = v2 * 2.f - lightPosition;
+        glBegin( GL_TRIANGLE_STRIP );
+        glVertex3fv( glm::value_ptr( v1 ) );
+        glVertex3fv( glm::value_ptr( v2 ) );
+        glVertex3fv( glm::value_ptr( v3 ) );
+        glVertex3fv( glm::value_ptr( v4 ) );
+        glEnd();
         triInd.clear();
     }
     
@@ -147,37 +149,34 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
 void Renderer::AmbientPass() {
     glBlendFunc( GL_ONE, GL_ZERO );
     glDepthMask( GL_TRUE );
-    glm::vec3 color1( 0.5f );
+    glm::vec3 color1( 0.2f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color1 ) );
     for ( auto s : drawSurfaces )
         R_DrawSurface( *s );
-    glm::vec3 color0( 0.5f );
+    glm::vec3 color0( 0.0f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color0 ) );
     glDepthMask( GL_FALSE );
 }
 
 void Renderer::ShadowPass( glm::vec3& lightPosition ) {
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-    glPushAttrib( GL_ENABLE_BIT );
-    glDisable( GL_CULL_FACE );
-    glStencilOp( GL_KEEP, GL_KEEP, GL_INVERT );
+    glCullFace( GL_FRONT );
+    glStencilOp( GL_KEEP, GL_KEEP, GL_INCR );
     for ( auto s : drawSurfaces )
         if ( s->texture )
             R_DrawSurfaceShadow( *s, lightPosition );
-    /*glCullFace( GL_BACK );
+    glCullFace( GL_BACK );
     glStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
     for ( auto s : drawSurfaces )
         if ( s->texture )
-            R_DrawSurfaceShadow( *s, lightPosition );*/
-    glPopAttrib();
+            R_DrawSurfaceShadow( *s, lightPosition );
     glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
     glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-    glCullFace( GL_BACK );
 }
 
 void Renderer::LightPass( glm::vec4& lightPosition ) {
     glBlendFunc( GL_ONE, GL_ONE );
-    //glEnable( GL_LIGHT0 );
+    glEnable( GL_LIGHT0 );
     glLightfv( GL_LIGHT0, GL_POSITION, glm::value_ptr( lightPosition ) );
 
     glStencilFunc( GL_EQUAL, 128, 255 );

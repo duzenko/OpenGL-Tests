@@ -19,16 +19,25 @@ void DrawSurface::BuildEdges() {
             };
             assert( !t2.Degenerate() );
             std::vector<glm::vec3> found;
+            bool reverse = false;
             for ( int k = 0; k < 3; k++ ) {
                 if ( t2.Contains( t1.vertices[k] ) )
                     found.push_back( t1.vertices[k] );
+                else
+                    if ( k == 1 )
+                        reverse = true;
             }
             assert( found.size() < 3 );
             if ( found.size() < 2 )
                 continue;
             SurfaceEdge edge;
-            edge.v1 = found[0];
-            edge.v2 = found[1];
+            if ( !reverse ) {
+                edge.v1 = found[1];
+                edge.v2 = found[0];
+            } else {
+                edge.v1 = found[0];
+                edge.v2 = found[1];
+            }
             edge.n1 = t1.Normal();
             edge.n2 = t2.Normal();
             if ( edge.n1 == edge.n2 )
