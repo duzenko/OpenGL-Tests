@@ -3,17 +3,10 @@
 #include "stdafx.h"
 
 struct Renderer: AbstractRenderer {
-    TerrainModel terrain;
 
     Renderer();
     ~Renderer();
     void Render(Simulation &simulation );
-
-    static bool wireframe;
-    static bool culling;
-    static float cameraAngle;
-
-    static PerformanceCounters PC;
 
 private:
     void ListSurfaces( Simulation& simulation );

@@ -9,7 +9,6 @@ struct Image {
     int width = 0, height = 0;
     std::string fileName;
     std::vector<char> data;
-    unsigned int texHandle = 0;
 
     Image() {}
     ~Image() {}

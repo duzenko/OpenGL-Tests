@@ -1,10 +1,5 @@
 ﻿#include "stdafx.h"
 
-bool Renderer::wireframe = false;
-bool Renderer::culling = true;
-float Renderer::cameraAngle = 0;
-PerformanceCounters Renderer::PC;
-
 struct Viewport {
     int x, y, width, height;
 };
@@ -12,6 +7,7 @@ struct Viewport {
 std::vector<DrawSurface*> drawSurfaces;
 
 Renderer::Renderer() {
+    images = new TextureImages();
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
         exit( -1 );
@@ -86,33 +82,36 @@ void Renderer::ListSurfaces( Simulation& simulation ) {
     }
 }
 
+void R_BindTexture( Image* image ) {
+    auto img = (TextureImage*) image;
+    img->Bind();
+}
+
 void R_DrawSurface(DrawSurface &surface) {
-/*    glPushMatrix();
+    glPushMatrix();
     glMultMatrixf( glm::value_ptr( surface.model->modelMatrix ) );
-    glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
-    if ( !surface.normals.empty() ) {
-        glEnableClientState( GL_NORMAL_ARRAY );
-        glNormalPointer( GL_FLOAT, 0, surface.normals.data() );
-    } else
-        glDisableClientState( GL_NORMAL_ARRAY );
+    if ( surface.texture && surface.texture->state == Image::State::Loaded )
+    glColor3fv( glm::value_ptr( surface.color ) );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glm::value_ptr( surface.color ) );
     if ( !surface.texCoords.empty() && surface.texture ) {
-        glTexCoordPointer( 2, GL_FLOAT, 0, surface.texCoords.data() );
-        surface.texture->Bind();
+        R_BindTexture( surface.texture );
     } else {
-        Images::Unbind();
+        TextureImages::Unbind();
     }
-    glColor3fv( &surface.color.x );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &surface.color.x );
-    glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
+    glBegin( GL_TRIANGLES );
+    for ( auto index : surface.indices ) {
+        if ( !surface.texCoords.empty() && surface.texture )
+            glTexCoord2fv( glm::value_ptr( surface.texCoords[index] ) );
+        glNormal3fv( glm::value_ptr( surface.normals[index] ) );
+        glVertex3fv( glm::value_ptr( surface.vertices[index] ) );
+    }
+    glEnd();
     Renderer::PC.drawCalls++;
     Renderer::PC.drawTriangles += surface.indices.size() / 3;
-    glPopMatrix();*/
+    glPopMatrix();
 }
 
 void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
-/*    glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
-    glDisableClientState( GL_NORMAL_ARRAY );
-    Images::Unbind();
     std::vector<int> triInd;
     for ( auto& edge : surface.edges ) {
         auto v1w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.v1, 1 ) );
@@ -139,7 +138,7 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
     }
     
     Renderer::PC.drawCalls++;
-    Renderer::PC.drawTriangles += surface.indices.size() / 3;*/
+    Renderer::PC.drawTriangles += surface.indices.size() / 3;
 }
 
 void Renderer::AmbientPass() {
