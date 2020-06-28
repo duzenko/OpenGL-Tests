@@ -1,16 +1,9 @@
 #pragma once
 
-#define _USE_MATH_DEFINES // for C++
-#include <math.h>
+#include "stdafx.h"
 
-#include "Simulation.h"
-#include "Image.h"
-
-struct Renderer {
-    int dlStars;
-    int dlEarth;
-    int dlMoon;
-    int dlSun;
+struct Renderer: AbstractRenderer {
+    TerrainModel terrain;
 
     Renderer();
     ~Renderer();
@@ -19,4 +12,12 @@ struct Renderer {
     static bool wireframe;
     static bool culling;
     static float cameraAngle;
+
+    static PerformanceCounters PC;
+
+private:
+    void ListSurfaces( Simulation& simulation );
+    void AmbientPass();
+    void ShadowPass( glm::vec3& lightPosition );
+    void LightPass( glm::vec4& lightPosition );
 };

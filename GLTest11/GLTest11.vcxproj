@@ -154,25 +154,25 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="GLTest11.cpp" />
-    <ClCompile Include="Image.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RenderModel.cpp" />
-    <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TextureImage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\GLTest10\Util.h" />
     <ClInclude Include="glad.h" />
-    <ClInclude Include="Image.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RenderModel.h" />
-    <ClInclude Include="Simulation.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TextureImage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.vcxproj">
+      <Project>{e4716fc2-ef38-4c9a-8f42-cb7d79f62ad0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

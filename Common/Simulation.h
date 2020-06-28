@@ -24,7 +24,7 @@ struct Simulation {
     glm::vec3 skyColor = { 0, 0, 0 };
 
     Simulation() {
-        blocks.resize( 64 );
+        blocks.resize( 16 );
     }
 
     void Update( double newTime ) {

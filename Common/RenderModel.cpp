@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 
 std::filesystem::directory_iterator randomTextureDI( "..\\assets\\pdtextures" );
 std::vector<std::string> randomTextures;
@@ -55,7 +55,7 @@ CubeModel::CubeModel() {
     if ( randomTextures.empty() )
         for ( auto entry : randomTextureDI )
             randomTextures.push_back( entry.path().string() );
-    surface.texture = Images::get( randomTextures[rand() % randomTextures.size()] );
+    surface.texture = AbstractRenderer::images->get( randomTextures[rand() % randomTextures.size()] );
     surface.BuildEdges();
 }
 
