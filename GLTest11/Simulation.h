@@ -24,11 +24,11 @@ struct Simulation {
     glm::vec3 skyColor = { 0, 0, 0 };
 
     Simulation() {
-        blocks.resize( 32 );
+        blocks.resize( 4 );
     }
 
     void Update( double newTime ) {
-        //newTime = 0.5;
+        newTime = 17.5;
         glm::vec3 lightDir = glm::rotate( glm::vec3( 0, 0, 1 ), 3 - (float) newTime * .05f, glm::vec3( -2, 1, 0 ) );
         light.position = { lightDir * 1e5f, 1 };
         auto h = lightDir.y;

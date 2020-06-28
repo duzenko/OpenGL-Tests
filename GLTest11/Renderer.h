@@ -35,6 +35,6 @@ struct Renderer {
 private:
     void ListSurfaces( Simulation& simulation );
     void AmbientPass();
-    void ShadowPass( glm::vec4& lightPosition );
+    void ShadowPass( glm::vec3& lightPosition );
     void LightPass( glm::vec4& lightPosition );
 };

@@ -3,15 +3,51 @@
 std::filesystem::directory_iterator randomTextureDI( "..\\assets\\pdtextures" );
 std::vector<std::string> randomTextures;
 
+void DrawSurface::BuildEdges() {
+    for ( size_t i = 0; i < indices.size(); i += 3 ) {
+        SurfaceTriangle t1 = {
+            vertices[indices[i]],
+            vertices[indices[i+1]],
+            vertices[indices[i+2]],
+        };
+        assert( !t1.Degenerate() );
+        for ( size_t j = i+3; j < indices.size(); j += 3 ) {
+            SurfaceTriangle t2 = {
+                vertices[indices[j]],
+                vertices[indices[j + 1]],
+                vertices[indices[j + 2]],
+            };
+            assert( !t2.Degenerate() );
+            std::vector<glm::vec3> found;
+            for ( int k = 0; k < 3; k++ ) {
+                if ( t2.Contains( t1.vertices[k] ) )
+                    found.push_back( t1.vertices[k] );
+            }
+            assert( found.size() < 3 );
+            if ( found.size() < 2 )
+                continue;
+            SurfaceEdge edge;
+            edge.v1 = found[0];
+            edge.v2 = found[1];
+            edge.n1 = t1.Normal();
+            edge.n2 = t2.Normal();
+            if ( glm::normalize( edge.n1 ) == glm::normalize( edge.n2 ) )
+                continue; // rect halves
+            edges.push_back( edge );
+        }
+    }
+}
+
 CubeModel::CubeModel() {
     name = "cube #XX";
-    modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -22, 15 ), 1, glm::linearRand( -33, 7 ) ) );
+    modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -15, 15 ), 1, glm::linearRand( -5, 5 ) ) );
     drawBox();
     auto& surface = surfaces[0];
     if ( randomTextures.empty() )
         for ( auto entry : randomTextureDI )
             randomTextures.push_back( entry.path().string() );
     surface.texture = Images::get( randomTextures[rand() % randomTextures.size()] );
+    surface.BuildEdges();
 }
 
 void CubeModel::drawBox() {
