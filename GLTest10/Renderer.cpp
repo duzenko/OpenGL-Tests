@@ -33,7 +33,6 @@ Renderer::Renderer() {
     glClearStencil( 128 );
 }
 
-
 Renderer::~Renderer() {
 }
 
@@ -97,7 +96,6 @@ void R_DrawSurface(DrawSurface &surface) {
 }
 
 void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
-    std::vector<int> triInd;
     for ( auto& edge : surface.edges ) {
         auto v1w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.v1, 1 ) );
         auto n1w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.n1, 0 ) );
@@ -119,7 +117,6 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
         glVertex3fv( glm::value_ptr( v3 ) );
         glVertex3fv( glm::value_ptr( v4 ) );
         glEnd();
-        triInd.clear();
     }
     
     Renderer::PC.drawCalls++;
@@ -139,6 +136,8 @@ void Renderer::AmbientPass() {
 }
 
 void Renderer::ShadowPass( glm::vec3& lightPosition ) {
+    if ( !shadows )
+        return;
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
     glCullFace( GL_FRONT );
     glStencilOp( GL_KEEP, GL_KEEP, GL_INCR );

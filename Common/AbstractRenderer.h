@@ -14,6 +14,7 @@ public:
 
 	static bool wireframe;
 	static bool culling;
+	static bool shadows;
 	static float cameraAngle;
 
 	static PerformanceCounters PC;

@@ -16,6 +16,8 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
             Renderer::wireframe = !Renderer::wireframe;
         if ( key == GLFW_KEY_C )
             Renderer::culling = !Renderer::culling;
+        if ( key == GLFW_KEY_S )
+            Renderer::shadows = !Renderer::shadows;
         if ( key == GLFW_KEY_V )
             glfwSwapInterval( swapInterval = !swapInterval );
     }

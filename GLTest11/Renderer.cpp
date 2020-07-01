@@ -148,6 +148,8 @@ void Renderer::AmbientPass() {
 }
 
 void Renderer::ShadowPass( glm::vec3& lightPosition ) {
+    if ( !shadows )
+        return;
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
     glCullFace( GL_FRONT );
     glStencilOp( GL_KEEP, GL_KEEP, GL_INCR );

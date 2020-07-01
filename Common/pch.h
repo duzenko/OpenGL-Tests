@@ -12,6 +12,7 @@
 
 #include <Windows.h>
 
+#define GLM_FORCE_INLINE
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_float4x4.hpp> 
 #include <glm/ext/matrix_clip_space.hpp> 

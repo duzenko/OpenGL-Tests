@@ -49,7 +49,7 @@ void DrawSurface::BuildEdges() {
 
 CubeModel::CubeModel() {
     name = "cube #XX";
-    modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -15, 15 ), 1, glm::linearRand( -5, 25 ) ) );
+    modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -15, 15 ), 1, glm::linearRand( -35, 15 ) ) );
     drawBox();
     auto& surface = surfaces[0];
     if ( randomTextures.empty() )
