@@ -1,13 +1,8 @@
 ﻿#include "stdafx.h"
 
-struct Viewport {
-    int x, y, width, height;
-};
-
 std::vector<DrawSurface*> drawSurfaces;
 
 Renderer::Renderer() {
-    images = new TextureImages();
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
         exit( -1 );
@@ -82,22 +77,12 @@ void Renderer::ListSurfaces( Simulation& simulation ) {
     }
 }
 
-void R_BindTexture( Image* image ) {
-    auto img = (TextureImage*) image;
-    img->Bind();
-}
-
 void R_DrawSurface(DrawSurface &surface) {
     glPushMatrix();
     glMultMatrixf( glm::value_ptr( surface.model->modelMatrix ) );
-    if ( surface.texture && surface.texture->state == Image::State::Loaded )
     glColor3fv( glm::value_ptr( surface.color ) );
     glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glm::value_ptr( surface.color ) );
-    if ( !surface.texCoords.empty() && surface.texture ) {
-        R_BindTexture( surface.texture );
-    } else {
-        TextureImages::Unbind();
-    }
+    images.Bind( surface.texture );
     glBegin( GL_TRIANGLES );
     for ( auto index : surface.indices ) {
         if ( !surface.texCoords.empty() && surface.texture )

@@ -1,14 +1,8 @@
 ﻿#include "stdafx.h"
 
-struct Viewport {
-    int x, y, width, height;
-};
-
 std::vector<DrawSurface*> drawSurfaces;
 
 Renderer::Renderer() {
-    images = new TextureImages();
-
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
         exit( -1 );
@@ -39,7 +33,6 @@ Renderer::Renderer() {
     glEnable( GL_STENCIL_TEST );
     glClearStencil( 128 );
 }
-
 
 Renderer::~Renderer() {
 }
@@ -84,11 +77,6 @@ void Renderer::ListSurfaces( Simulation& simulation ) {
     }
 }
 
-void R_BindTexture(Image *image) {
-    auto img = (TextureImage*) image;
-    img->Bind();
-}
-
 void R_DrawSurface( DrawSurface& surface ) {
     glPushMatrix();
     glMultMatrixf( glm::value_ptr( surface.model->modelMatrix ) );
@@ -98,25 +86,26 @@ void R_DrawSurface( DrawSurface& surface ) {
         glNormalPointer( GL_FLOAT, 0, surface.normals.data() );
     } else
         glDisableClientState( GL_NORMAL_ARRAY );
-    if ( !surface.texCoords.empty() && surface.texture ) {
+    if ( !surface.texCoords.empty() ) {
+        glEnableClientState( GL_TEXTURE_COORD_ARRAY );
         glTexCoordPointer( 2, GL_FLOAT, 0, surface.texCoords.data() );
-        R_BindTexture( surface.texture );
     } else {
-        TextureImages::Unbind();
+        glDisableClientState( GL_TEXTURE_COORD_ARRAY );
     }
-    glColor3fv( &surface.color.x );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &surface.color.x );
+    images.Bind( surface.texture );
+    glColor3fv( glm::value_ptr( surface.color ) );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glm::value_ptr( surface.color ) );
     glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
+    glPopMatrix();
     Renderer::PC.drawCalls++;
     Renderer::PC.drawTriangles += surface.indices.size() / 3;
-    glPopMatrix();
 }
 
 bool shbf = true;
 void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
     glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
     glDisableClientState( GL_NORMAL_ARRAY );
-    TextureImages::Unbind();
+    images.Bind( nullptr );
     std::vector<int> triInd;
     for ( auto& edge : surface.edges ) {
         auto v1w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.v1, 1 ) );

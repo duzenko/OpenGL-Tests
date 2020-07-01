@@ -36,7 +36,7 @@ struct SurfaceEdge {
 
 struct DrawSurface {
     glm::vec3 color = { 1, 1, 1 };
-    Image* texture = nullptr;
+    AbstractImage* texture = nullptr;
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> texCoords;

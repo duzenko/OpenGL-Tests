@@ -1,13 +1,17 @@
-#include "Image.h"
+#include "stdafx.h"
 
-#include <cstdio>
-#include <im.h>
-
-Image::Image( const char* fileName ) {
-    int error;
-    auto f = imFileOpen( fileName, &error );
-    int cm, dt;
-    imFileReadImageInfo( f, 0, &width, &height, &cm, &dt );
-    data = new unsigned char[3 * width * height];
-    imFileReadImageData( f, data, 1, IM_PACKED );
+void Image::Bind() {
+    if ( !displayList ) {
+        displayList = glGenLists( 1 );
+        printf( "Load texHandle %d\n", displayList );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+        glNewList( displayList, GL_COMPILE );
+        glEnable( GL_TEXTURE_2D );
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data.data() );
+        glEndList();
+    }
+    glCallList( displayList );
+    Renderer::PC.textureSwitches++;
 }

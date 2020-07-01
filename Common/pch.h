@@ -1,13 +1,14 @@
 #pragma once
 
 #include <filesystem>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>         
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <vector>
-#include <list>
 
 #include <Windows.h>
 
@@ -22,7 +23,8 @@
 
 #include <im.h>
 
-#include "Image.h"
+#include "AbstractImage.h"
 #include "RenderModel.h"
 #include "Simulation.h"
 #include "AbstractRenderer.h"
+#include "Util.h"

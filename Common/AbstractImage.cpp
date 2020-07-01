@@ -43,7 +43,7 @@ private:
     std::condition_variable c;
 };
 
-SafeQueue<Image*> imageQueue;
+SafeQueue<AbstractImage*> imageQueue;
 
 void LoadImages();
 
@@ -51,18 +51,22 @@ std::thread ImageLoader( LoadImages );
 
 void LoadImages() {
     ImageLoader.detach();
-    while ( Image* image = imageQueue.dequeue() ) {
-        int error;
-        auto f = imFileOpen( image->fileName.c_str(), &error );
-        int cm, dt;
-        imFileReadImageInfo( f, 0, &image->width, &image->height, &cm, &dt );
-        image->data.resize( 3 * image->width * image->height );
-        imFileReadImageData( f, image->data.data(), 1, IM_PACKED );
-        image->state = Image::State::Loaded;
+    while ( AbstractImage* image = imageQueue.dequeue() ) {
+        image->Load();
     }
 }
 
+void AbstractImage::Load() {
+    int error;
+    auto image = this;
+    auto f = imFileOpen( image->fileName.c_str(), &error );
+    int cm, dt;
+    imFileReadImageInfo( f, 0, &image->width, &image->height, &cm, &dt );
+    image->data.resize( 3 * image->width * image->height );
+    imFileReadImageData( f, image->data.data(), 1, IM_PACKED );
+    image->state = AbstractImage::State::Loaded;
+}
 
-void Image::Load() {
+void AbstractImage::BeginLoading() {
     imageQueue.enqueue( this );
 }

@@ -6,22 +6,16 @@ struct PerformanceCounters {
 	int textureSwitches;
 };
 
-class AbstractRenderer {
+struct AbstractRenderer {
 public:
-	static Images* images;
-
 	TerrainModel terrain;
 
-	void Render( Simulation& simulation );
+	virtual void Render( Simulation& simulation ) = 0;
 
 	static bool wireframe;
 	static bool culling;
 	static float cameraAngle;
 
 	static PerformanceCounters PC;
-
-	AbstractRenderer() {
-		images = new Images();
-	}
 };
 

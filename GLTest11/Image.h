@@ -1,7 +1,7 @@
 #pragma once
 
 struct Image : AbstractImage {
-    GLuint displayList = 0;
+    GLuint texHandle = 0;
     void Bind();
 };
 

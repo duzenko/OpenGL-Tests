@@ -160,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AbstractRenderer.h" />
-    <ClInclude Include="Image.h" />
+    <ClInclude Include="AbstractImage.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderModel.h" />
     <ClInclude Include="Simulation.h" />
@@ -168,7 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractRenderer.cpp" />
-    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="AbstractImage.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

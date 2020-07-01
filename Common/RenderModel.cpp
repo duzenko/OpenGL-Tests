@@ -55,7 +55,7 @@ CubeModel::CubeModel() {
     if ( randomTextures.empty() )
         for ( auto entry : randomTextureDI )
             randomTextures.push_back( entry.path().string() );
-    surface.texture = AbstractRenderer::images->get( randomTextures[rand() % randomTextures.size()] );
+    surface.texture = abstractImages->Get( randomTextures[rand() % randomTextures.size()] );
     surface.BuildEdges();
 }
 

@@ -3,5 +3,7 @@
 #include "..\Common\pch.h"
 #include "glad.h"
 
-#include "TextureImage.h"
+#include "Image.h"
 #include "Renderer.h"
+
+extern Images images;
