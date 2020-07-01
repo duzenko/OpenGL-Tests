@@ -8,6 +8,7 @@ The project requires the following libraries installed in the root folder
 
 # Keyboard shortcuts
 - Esc - exit
-- W - toggle wireframe mode
-- C = toggle face culling
+- C - toggle face culling
+- S - toggle shadows
 - V - toggle V-Sync
+- W - toggle wireframe mode
