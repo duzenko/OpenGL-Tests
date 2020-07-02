@@ -22,6 +22,7 @@ struct Simulation {
     std::vector<CubeModel> blocks;
     Light light;
     glm::vec3 skyColor = { 0, 0, 0 };
+    double time;
 
     Simulation() {
         blocks.resize( 128 );
@@ -29,7 +30,9 @@ struct Simulation {
 
     void Update( double newTime ) {
         //newTime = 17.5;
-        glm::vec3 lightDir = glm::rotate( glm::vec3( 0, 0, 1 ), 3 - (float) newTime * .05f, glm::vec3( -2, 1, 0 ) );
+        if ( !paused )
+            time = newTime;
+        glm::vec3 lightDir = glm::rotate( glm::vec3( 0, 0, 1 ), 3 - (float) time * .05f, glm::vec3( -2, 1, 0 ) );
         light.position = { lightDir * 1e5f, 1 };
         auto h = lightDir.y;
         skyColor = { 0.7f, 0.8f, 1 };
@@ -38,5 +41,7 @@ struct Simulation {
         auto ha = fmaxf( h, 0 );
         light.color = { ha, ha, ha * ha };
     }
+
+    static bool paused;
 };
 

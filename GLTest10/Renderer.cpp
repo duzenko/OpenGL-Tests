@@ -62,6 +62,8 @@ void Renderer::Render( Simulation& simulation ) {
     
     glLightfv( GL_LIGHT0, GL_DIFFUSE, glm::value_ptr( simulation.light.color ) );
     LightPass( simulation.light.position );
+
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 }
 
 void Renderer::ListSurfaces( Simulation& simulation ) {

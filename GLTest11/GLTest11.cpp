@@ -12,14 +12,20 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
     if ( action == GLFW_PRESS ) {
         if ( key == GLFW_KEY_ESCAPE )
             glfwSetWindowShouldClose( window, GLFW_TRUE );
-        if ( key == GLFW_KEY_W )
-            Renderer::wireframe = !Renderer::wireframe;
+        if ( key == GLFW_KEY_SPACE )
+            Simulation::paused = !Simulation::paused;
+        if ( key == GLFW_KEY_A )
+            Renderer::ambient = !Renderer::ambient;
         if ( key == GLFW_KEY_C )
             Renderer::culling = !Renderer::culling;
+        if ( key == GLFW_KEY_L )
+            Renderer::lighting = !Renderer::lighting;
         if ( key == GLFW_KEY_S )
             Renderer::shadows = !Renderer::shadows;
         if ( key == GLFW_KEY_V )
             glfwSwapInterval( swapInterval = !swapInterval );
+        if ( key == GLFW_KEY_W )
+            Renderer::wireframe = !Renderer::wireframe;
     }
     if ( action != GLFW_RELEASE ) {
         if ( key == GLFW_KEY_LEFT )
@@ -79,6 +85,6 @@ int main() {
 }
 
 extern "C" {
-    __declspec( dllexport ) int NvOptimusEnablement = 0x00000001;
-    __declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
+    //__declspec( dllexport ) int NvOptimusEnablement = 0x00000001;
+    //__declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
 }

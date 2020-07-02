@@ -12,9 +12,11 @@ public:
 
 	virtual void Render( Simulation& simulation ) = 0;
 
-	static bool wireframe;
+	static bool ambient;
 	static bool culling;
+	static bool lighting;
 	static bool shadows;
+	static bool wireframe;
 	static float cameraAngle;
 
 	static PerformanceCounters PC;

@@ -63,6 +63,8 @@ void Renderer::Render( Simulation& simulation ) {
     
     glLightfv( GL_LIGHT0, GL_DIFFUSE, glm::value_ptr( simulation.light.color ) );
     LightPass( simulation.light.position );
+
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 }
 
 void Renderer::ListSurfaces( Simulation& simulation ) {
@@ -106,7 +108,6 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
     glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
     glDisableClientState( GL_NORMAL_ARRAY );
     images.Bind( nullptr );
-    std::vector<int> triInd;
     for ( auto& edge : surface.edges ) {
         auto v1w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.v1, 1 ) );
         auto n1w = glm::vec3( surface.model->modelMatrix * glm::vec4( edge.n1, 0 ) );
@@ -128,15 +129,15 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
         glVertex3fv( glm::value_ptr( v3 ) );
         glVertex3fv( glm::value_ptr( v4 ) );
         glEnd();
-        triInd.clear();
+        Renderer::PC.drawCalls++;
     }
     
-    Renderer::PC.drawCalls++;
-    Renderer::PC.drawTriangles += surface.indices.size() / 3;
+    //Renderer::PC.drawTriangles += surface.indices.size() / 3;
 }
 
 void Renderer::AmbientPass() {
-    glBlendFunc( GL_ONE, GL_ZERO );
+    if ( !ambient )
+        return;
     glDepthMask( GL_TRUE );
     glm::vec3 color1( 0.2f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color1 ) );
@@ -166,6 +167,8 @@ void Renderer::ShadowPass( glm::vec3& lightPosition ) {
 }
 
 void Renderer::LightPass( glm::vec4& lightPosition ) {
+    if ( !lighting )
+        return;   
     glBlendFunc( GL_ONE, GL_ONE );
     glEnable( GL_LIGHT0 );
     glLightfv( GL_LIGHT0, GL_POSITION, glm::value_ptr( lightPosition ) );
@@ -175,4 +178,5 @@ void Renderer::LightPass( glm::vec4& lightPosition ) {
         R_DrawSurface( *s );
     glStencilFunc( GL_ALWAYS, 0, 255 );
     glDisable( GL_LIGHT0 );
+    glBlendFunc( GL_ONE, GL_ZERO );
 }
