@@ -2,7 +2,8 @@
 
 struct AbstractImage {
     std::string fileName;
-   
+    bool hasAlpha = false;
+
     AbstractImage() {}
     ~AbstractImage() {}
     void BeginLoading();
@@ -24,7 +25,7 @@ protected:
     State state = State::Empty;
 
     int width = 0, height = 0;
-    std::vector<char> data;
+    std::vector<unsigned char> data;
 };
 
 struct AbstractImages {

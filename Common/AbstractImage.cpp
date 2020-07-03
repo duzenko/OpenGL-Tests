@@ -52,7 +52,7 @@ std::thread ImageLoader( LoadImages );
 void LoadImages() {
     ImageLoader.detach();
     while ( AbstractImage* image = imageQueue.dequeue() ) {
-        image->Load();
+		image->Load();
     }
 }
 
@@ -62,8 +62,9 @@ void AbstractImage::Load() {
     auto f = imFileOpen( image->fileName.c_str(), &error );
     int cm, dt;
     imFileReadImageInfo( f, 0, &image->width, &image->height, &cm, &dt );
-    image->data.resize( 3 * image->width * image->height );
-    imFileReadImageData( f, image->data.data(), 1, IM_PACKED );
+    hasAlpha = IM_ALPHA & cm;
+    image->data.resize( (hasAlpha ? 4 : 3) * image->width * image->height );
+    imFileReadImageData( f, image->data.data(), 1, hasAlpha ? IM_PACKED | IM_ALPHA : IM_PACKED );
     image->state = AbstractImage::State::Loaded;
 }
 

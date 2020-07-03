@@ -67,6 +67,10 @@ void Renderer::Render( Simulation& simulation ) {
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 }
 
+bool compareByAlpha( DrawSurface* a, DrawSurface* b ) {
+    return ( a->texture && a->texture->hasAlpha ) < ( b->texture && b->texture->hasAlpha );
+}
+
 void Renderer::ListSurfaces( Simulation& simulation ) {
     drawSurfaces.clear();
     for ( auto& s : terrain.surfaces ) {
@@ -77,6 +81,10 @@ void Renderer::ListSurfaces( Simulation& simulation ) {
             drawSurfaces.push_back( &s );
         }
     }
+    for ( auto& s : simulation.clouds.surfaces ) {
+        drawSurfaces.push_back( &s );
+    }
+    std::sort( drawSurfaces.begin(), drawSurfaces.end(), compareByAlpha );
 }
 
 void R_DrawSurface( DrawSurface& surface ) {
@@ -103,7 +111,6 @@ void R_DrawSurface( DrawSurface& surface ) {
     Renderer::PC.drawTriangles += surface.indices.size() / 3;
 }
 
-bool shbf = true;
 void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
     glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
     glDisableClientState( GL_NORMAL_ARRAY );
@@ -138,14 +145,21 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
 void Renderer::AmbientPass() {
     if ( !ambient )
         return;
-    glDepthMask( GL_TRUE );
     glm::vec3 color1( 0.2f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color1 ) );
-    for ( auto s : drawSurfaces )
+    auto alphaSurfs = false;
+    glBlendFunc( GL_ONE, GL_ZERO );
+    glDepthMask( GL_TRUE );
+    for ( auto s : drawSurfaces ) {
+        if ( !alphaSurfs && s->texture && s->texture->hasAlpha ) {
+            glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            glDepthMask( GL_FALSE );
+            alphaSurfs = true;
+        }
         R_DrawSurface( *s );
+    }
     glm::vec3 color0( 0.0f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color0 ) );
-    glDepthMask( GL_FALSE );
 }
 
 void Renderer::ShadowPass( glm::vec3& lightPosition ) {
@@ -175,7 +189,8 @@ void Renderer::LightPass( glm::vec4& lightPosition ) {
 
     glStencilFunc( GL_EQUAL, 128, 255 );
     for ( auto s : drawSurfaces )
-        R_DrawSurface( *s );
+        if ( !s->normals.empty() )
+            R_DrawSurface( *s );
     glStencilFunc( GL_ALWAYS, 0, 255 );
     glDisable( GL_LIGHT0 );
     glBlendFunc( GL_ONE, GL_ZERO );

@@ -1,17 +1,6 @@
 #pragma once
 
-#define _USE_MATH_DEFINES // for C++
-#include <math.h>
-#include <vector>
-
-#include <glm/ext/matrix_float4x4.hpp> 
-#include <glm/ext/matrix_clip_space.hpp> 
-#include <glm/trigonometric.hpp> 
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/random.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-
-#include "RenderModel.h"
+#include "pch.h"
 
 struct Light {
     glm::vec4 position = { 0, 0, 0, 1 };
@@ -20,9 +9,10 @@ struct Light {
 
 struct Simulation {
     std::vector<CubeModel> blocks;
+    CloudModel clouds;
     Light light;
     glm::vec3 skyColor = { 0, 0, 0 };
-    double time;
+    double time = 0;
 
     Simulation() {
         blocks.resize( 128 );
@@ -40,6 +30,9 @@ struct Simulation {
 
         auto ha = fmaxf( h, 0 );
         light.color = { ha, ha, ha * ha };
+        auto cloudColor = glm::vec4( 5 * skyColor.z, 5 * skyColor.z, 5 * skyColor.z, 1 );
+        for ( auto& s : clouds.surfaces )
+            s.color = cloudColor;
     }
 
     static bool paused;

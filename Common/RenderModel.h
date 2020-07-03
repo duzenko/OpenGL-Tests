@@ -35,14 +35,15 @@ struct SurfaceEdge {
 };
 
 struct DrawSurface {
-    glm::vec3 color = { 1, 1, 1 };
-    AbstractImage* texture = nullptr;
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> texCoords;
     std::vector<int> indices;
 
     std::vector<SurfaceEdge> edges;
+
+    glm::vec4 color = { 1, 1, 1, 1 };
+    AbstractImage* texture = nullptr;
 
     RenderModel* model = nullptr;
 
@@ -83,7 +84,7 @@ struct TerrainModel: RenderModel {
             {0, 1, 0},
         };
         surface.indices = { 0, 1, 2, 1, 3, 2 };
-        surface.color = { 0, 0.3f, 0 };
+        surface.color = { 0, 0.3f, 0, 0 };
     }
 };
 
@@ -91,4 +92,9 @@ struct CubeModel : RenderModel {
     CubeModel();
 private:
     void drawBox();
+};
+
+struct CloudModel : RenderModel {
+
+    CloudModel();
 };
