@@ -47,6 +47,12 @@ void DrawSurface::BuildEdges() {
     }
 }
 
+void DrawSurface::ForEachTriangle( void ( *callback )( glm::vec3* ) ) {
+    for ( size_t i = 0; i < indices.size(); i += 3 ) {
+        callback( &vertices[indices[i]] );
+    }
+}
+
 CubeModel::CubeModel() {
     name = "cube #XX";
     modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -15, 15 ), 1, glm::linearRand( -35, 15 ) ) );
@@ -111,9 +117,8 @@ void CubeModel::drawBox() {
     }
 }
 
-CloudModel::CloudModel() {
+CloudModel::CloudModel( float span ) {
     name = "cloud #XX";
-    float xyTranslate = 2e3;
     DrawSurface& surface = add();
     surface.color = { 1, 1, 1, 1 };
     surface.texture = abstractImages->Get( "..\\assets\\hiclipart.com 1.png" );
@@ -133,7 +138,7 @@ CloudModel::CloudModel() {
     std::vector<int> indices = { 0, 2, 1, 1, 2, 3 };
     auto tIndices = indices;
     for ( int i = 0; i < 1280; i++ ) {
-        auto translate = glm::translate( glm::vec3( glm::linearRand( -xyTranslate, xyTranslate ), 1e2, glm::linearRand( -xyTranslate, xyTranslate ) ) );
+        auto translate = glm::translate( glm::vec3( glm::linearRand( -span, span ), 1e2, glm::linearRand( -span, span ) ) );
         auto scale = glm::scale( glm::vec3( glm::linearRand<float>( 3, 33 ), 1, glm::linearRand<float>( 3, 33 ) ) );
         glm::mat4 mat;
         int offset;

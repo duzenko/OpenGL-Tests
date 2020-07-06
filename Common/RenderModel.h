@@ -48,6 +48,7 @@ struct DrawSurface {
     RenderModel* model = nullptr;
 
     void BuildEdges();
+    void ForEachTriangle(void (*callback)( glm::vec3*));
 };
 
 struct RenderModel {
@@ -96,5 +97,5 @@ private:
 
 struct CloudModel : RenderModel {
 
-    CloudModel();
+    CloudModel(float span);
 };
