@@ -1,7 +1,5 @@
 ﻿#include "stdafx.h"
 
-std::vector<DrawSurface*> drawSurfaces;
-
 Renderer::Renderer() {
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
@@ -56,7 +54,7 @@ void Renderer::Render( Simulation& simulation ) {
     glDepthMask( GL_TRUE );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
-    ListSurfaces( simulation );
+    ListSurfaces();
     AmbientPass();
   
     ShadowPass( glm::vec3( simulation.light.position ) );
@@ -67,29 +65,12 @@ void Renderer::Render( Simulation& simulation ) {
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 }
 
-bool compareByAlpha( DrawSurface* a, DrawSurface* b ) {
-    return ( a->texture && a->texture->hasAlpha ) < ( b->texture && b->texture->hasAlpha );
-}
-
-void Renderer::ListSurfaces( Simulation& simulation ) {
-    drawSurfaces.clear();
-    for ( auto& s : terrain.surfaces ) {
-        drawSurfaces.push_back( &s );
-    }
-    for ( auto& block : simulation.blocks ) {
-        for ( auto& s : block.surfaces ) {
-            drawSurfaces.push_back( &s );
-        }
-    }
-    for ( auto& s : simulation.clouds.surfaces ) {
-        drawSurfaces.push_back( &s );
-    }
-    std::sort( drawSurfaces.begin(), drawSurfaces.end(), compareByAlpha );
-}
-
 void R_DrawSurface( DrawSurface& surface ) {
     glPushMatrix();
     glMultMatrixf( glm::value_ptr( surface.model->modelMatrix ) );
+    images.Bind( surface.texture );
+    glColor3fv( glm::value_ptr( surface.color ) );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glm::value_ptr( surface.color ) );
     glVertexPointer( 3, GL_FLOAT, 0, surface.vertices.data() );
     if ( !surface.normals.empty() ) {
         glEnableClientState( GL_NORMAL_ARRAY );
@@ -102,9 +83,6 @@ void R_DrawSurface( DrawSurface& surface ) {
     } else {
         glDisableClientState( GL_TEXTURE_COORD_ARRAY );
     }
-    images.Bind( surface.texture );
-    glColor3fv( glm::value_ptr( surface.color ) );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glm::value_ptr( surface.color ) );
     glDrawElements( GL_TRIANGLES, surface.indices.size(), GL_UNSIGNED_INT, surface.indices.data() );
     glPopMatrix();
     Renderer::PC.drawCalls++;
@@ -193,5 +171,4 @@ void Renderer::LightPass( glm::vec4& lightPosition ) {
             R_DrawSurface( *s );
     glStencilFunc( GL_ALWAYS, 0, 255 );
     glDisable( GL_LIGHT0 );
-    glBlendFunc( GL_ONE, GL_ZERO );
 }

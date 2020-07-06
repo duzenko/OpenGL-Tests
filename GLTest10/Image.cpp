@@ -9,7 +9,9 @@ void Image::Bind() {
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
         glNewList( displayList, GL_COMPILE );
         glEnable( GL_TEXTURE_2D );
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data.data() );
+        auto format = hasAlpha ? GL_RGBA : GL_RGB;
+        auto components = hasAlpha ? 4: 3;
+        glTexImage2D( GL_TEXTURE_2D, 0, components, width, height, 0, format, GL_UNSIGNED_BYTE, data.data() );
         glEndList();
     }
     glCallList( displayList );

@@ -6,17 +6,10 @@ struct AbstractImage {
 
     AbstractImage() {}
     ~AbstractImage() {}
-    void BeginLoading();
-    void Load();
+
     virtual void Bind() = 0;
 
-    bool CheckLoaded() {
-        if ( state == State::Empty ) {
-            state = State::Loading;
-            AbstractImage::BeginLoading();
-        }
-        return state == State::Loaded;
-    }
+    bool CheckLoaded();
 
 protected:
     enum class State {
@@ -26,6 +19,11 @@ protected:
 
     int width = 0, height = 0;
     std::vector<unsigned char> data;
+private:
+    static void LoadImages();
+    static std::thread ImageLoader;
+
+    void Load();
 };
 
 struct AbstractImages {
@@ -34,7 +32,7 @@ struct AbstractImages {
             if ( image->fileName == fileName )
                 return image;
         }
-        auto image = genImage();
+        auto image = GenImage();
         image->fileName = fileName;
         images.push_back( image );
         return image;
@@ -56,7 +54,7 @@ struct AbstractImages {
 protected:
     AbstractImage* boundImage;
 
-    virtual AbstractImage* genImage() = 0;
+    virtual AbstractImage* GenImage() = 0;
     virtual void DisableTexturing() = 0;
 
 private:

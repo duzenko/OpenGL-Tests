@@ -2,6 +2,7 @@
 
 std::filesystem::directory_iterator randomTextureDI( "..\\assets\\pdtextures" );
 std::vector<std::string> randomTextures;
+RenderWorld renderWorld;
 
 void DrawSurface::BuildEdges() {
     for ( size_t i = 0; i < indices.size(); i += 3 ) {
@@ -51,6 +52,14 @@ void DrawSurface::ForEachTriangle( void ( *callback )( glm::vec3* ) ) {
     for ( size_t i = 0; i < indices.size(); i += 3 ) {
         callback( &vertices[indices[i]] );
     }
+}
+
+RenderModel::RenderModel() :modelMatrix( 1 ) {
+    renderWorld.models.insert( this );
+};
+
+RenderModel::~RenderModel() {
+    renderWorld.models.erase( this );
 }
 
 CubeModel::CubeModel() {

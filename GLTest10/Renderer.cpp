@@ -1,7 +1,5 @@
 ﻿#include "stdafx.h"
 
-std::vector<DrawSurface*> drawSurfaces;
-
 Renderer::Renderer() {
     if ( !gladLoadGL() ) {
         printf( "Something went wrong!\n" );
@@ -55,7 +53,7 @@ void Renderer::Render( Simulation& simulation ) {
     glDepthMask( GL_TRUE );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
-    ListSurfaces( simulation );
+    ListSurfaces();
     AmbientPass();
   
     ShadowPass( glm::vec3( simulation.light.position ) );
@@ -64,18 +62,6 @@ void Renderer::Render( Simulation& simulation ) {
     LightPass( simulation.light.position );
 
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-}
-
-void Renderer::ListSurfaces( Simulation& simulation ) {
-    drawSurfaces.clear();
-    for ( auto& s : terrain.surfaces ) {
-        drawSurfaces.push_back( &s );
-    }
-    for ( auto& block : simulation.blocks ) {
-        for ( auto& s : block.surfaces ) {
-            drawSurfaces.push_back( &s );
-        }
-    }
 }
 
 void R_DrawSurface(DrawSurface &surface) {
@@ -88,13 +74,14 @@ void R_DrawSurface(DrawSurface &surface) {
     for ( auto index : surface.indices ) {
         if ( !surface.texCoords.empty() && surface.texture )
             glTexCoord2fv( glm::value_ptr( surface.texCoords[index] ) );
-        glNormal3fv( glm::value_ptr( surface.normals[index] ) );
+        if ( !surface.normals.empty() )
+            glNormal3fv( glm::value_ptr( surface.normals[index] ) );
         glVertex3fv( glm::value_ptr( surface.vertices[index] ) );
     }
     glEnd();
+    glPopMatrix();
     Renderer::PC.drawCalls++;
     Renderer::PC.drawTriangles += surface.indices.size() / 3;
-    glPopMatrix();
 }
 
 void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
@@ -126,15 +113,23 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
 }
 
 void Renderer::AmbientPass() {
-    glBlendFunc( GL_ONE, GL_ZERO );
-    glDepthMask( GL_TRUE );
+    if ( !ambient )
+        return;
     glm::vec3 color1( 0.2f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color1 ) );
-    for ( auto s : drawSurfaces )
+    auto alphaSurfs = false;
+    glBlendFunc( GL_ONE, GL_ZERO );
+    glDepthMask( GL_TRUE );
+    for ( auto s : drawSurfaces ) {
+        if ( !alphaSurfs && s->texture && s->texture->hasAlpha ) {
+            glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            glDepthMask( GL_FALSE );
+            alphaSurfs = true;
+        }
         R_DrawSurface( *s );
+    }
     glm::vec3 color0( 0.0f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color0 ) );
-    glDepthMask( GL_FALSE );
 }
 
 void Renderer::ShadowPass( glm::vec3& lightPosition ) {
@@ -156,13 +151,16 @@ void Renderer::ShadowPass( glm::vec3& lightPosition ) {
 }
 
 void Renderer::LightPass( glm::vec4& lightPosition ) {
+    if ( !lighting )
+        return;
     glBlendFunc( GL_ONE, GL_ONE );
     glEnable( GL_LIGHT0 );
     glLightfv( GL_LIGHT0, GL_POSITION, glm::value_ptr( lightPosition ) );
 
     glStencilFunc( GL_EQUAL, 128, 255 );
     for ( auto s : drawSurfaces )
-        R_DrawSurface( *s );
+        if ( !s->normals.empty() )
+            R_DrawSurface( *s );
     glStencilFunc( GL_ALWAYS, 0, 255 );
     glDisable( GL_LIGHT0 );
 }

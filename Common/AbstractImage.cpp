@@ -45,11 +45,9 @@ private:
 
 SafeQueue<AbstractImage*> imageQueue;
 
-void LoadImages();
+std::thread AbstractImage::ImageLoader( AbstractImage::LoadImages );
 
-std::thread ImageLoader( LoadImages );
-
-void LoadImages() {
+void AbstractImage::LoadImages() {
     ImageLoader.detach();
     while ( AbstractImage* image = imageQueue.dequeue() ) {
 		image->Load();
@@ -68,6 +66,10 @@ void AbstractImage::Load() {
     image->state = AbstractImage::State::Loaded;
 }
 
-void AbstractImage::BeginLoading() {
-    imageQueue.enqueue( this );
+bool AbstractImage::CheckLoaded() {
+    if ( state == State::Empty ) {
+        state = State::Loading;
+        imageQueue.enqueue( this );
+    }
+    return state == State::Loaded;
 }

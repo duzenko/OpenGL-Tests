@@ -7,7 +7,7 @@ struct Image : AbstractImage {
 
 struct Images :AbstractImages {
 protected:
-    Image* genImage() {
+    Image* GenImage() {
         return new Image();
     }
 

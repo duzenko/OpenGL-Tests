@@ -56,7 +56,8 @@ struct RenderModel {
     std::vector<DrawSurface> surfaces;
     std::string name = "unnamed";
 
-    RenderModel() :modelMatrix( 1 ) {};
+    RenderModel();
+    ~RenderModel();
 
     DrawSurface &add() {
         int idx = surfaces.size();
@@ -99,3 +100,9 @@ struct CloudModel : RenderModel {
 
     CloudModel(float span);
 };
+
+struct RenderWorld {
+    std::set<RenderModel*> models;
+};
+
+extern RenderWorld renderWorld;

@@ -7,8 +7,12 @@ struct PerformanceCounters {
 };
 
 struct AbstractRenderer {
+
+protected:
+	std::vector<DrawSurface*> drawSurfaces;
+	void ListSurfaces();
+
 public:
-	TerrainModel terrain;
 
 	virtual void Render( Simulation& simulation ) = 0;
 

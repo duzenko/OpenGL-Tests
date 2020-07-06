@@ -13,6 +13,7 @@ struct Simulation {
     Light light;
     glm::vec3 skyColor = { 0, 0, 0 };
 
+    TerrainModel terrain;
     std::vector<CubeModel> blocks;
 
     float cloudSpan = 2e3;
