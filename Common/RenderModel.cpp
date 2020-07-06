@@ -114,29 +114,41 @@ void CubeModel::drawBox() {
 CloudModel::CloudModel() {
     name = "cloud #XX";
     float xyTranslate = 2e3;
+    DrawSurface& surface = add();
+    surface.color = { 1, 1, 1, 1 };
+    surface.texture = abstractImages->Get( "..\\assets\\hiclipart.com 1.png" );
+    std::vector<glm::vec3> verts = {
+        {-1, 0, -1},
+        {-1, 0, 1},
+        {1, 0, -1},
+        {1, 0, 1},
+    };
+    auto tVerts = verts;
+    std::vector<glm::vec2> texCoords = {
+        {0, 0},
+        {0, 1},
+        {1, 0},
+        {1, 1},
+    };
+    std::vector<int> indices = { 0, 2, 1, 1, 2, 3 };
+    auto tIndices = indices;
     for ( int i = 0; i < 1280; i++ ) {
         auto translate = glm::translate( glm::vec3( glm::linearRand( -xyTranslate, xyTranslate ), 1e2, glm::linearRand( -xyTranslate, xyTranslate ) ) );
         auto scale = glm::scale( glm::vec3( glm::linearRand<float>( 3, 33 ), 1, glm::linearRand<float>( 3, 33 ) ) );
-        DrawSurface& surface = add();
-        surface.vertices = {
-            {-1, 0, -1},
-            {-1, 0, 1},
-            {1, 0, -1},
-            {1, 0, 1},
-        };
-        auto mat = translate * scale;
+        glm::mat4 mat;
+        int offset;
+        mat = translate * scale;
+        offset = surface.vertices.size();
         auto matMul = [mat]( glm::vec3 v ) {
-            return glm::vec3( mat * glm::vec4( v, 1 ) ); 
+            return glm::vec3( mat * glm::vec4( v, 1 ) );
         };
-        std::transform( surface.vertices.begin(), surface.vertices.end(), surface.vertices.begin(), matMul );
-        surface.texCoords = {
-            {0, 0},
-            {0, 1},
-            {1, 0},
-            {1, 1},
+        auto idxOffset = [offset]( int idx ) {
+            return idx + offset;
         };
-        surface.indices = { 0, 2, 1, 1, 2, 3 };
-        surface.color = { 1, 1, 1, 1 };
-        surface.texture = abstractImages->Get( "..\\assets\\hiclipart.com 1.png" );
+        std::transform( verts.begin(), verts.end(), tVerts.begin(), matMul );
+        surface.vertices.insert( surface.vertices.end(), tVerts.begin(), tVerts.end() );
+        surface.texCoords.insert( surface.texCoords.begin(), texCoords.begin(), texCoords.end() );
+        std::transform( indices.begin(), indices.end(), tIndices.begin(), idxOffset );
+        surface.indices.insert( surface.indices.begin(), tIndices.begin(), tIndices.end() );
     }
 }
