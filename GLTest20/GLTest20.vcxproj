@@ -167,12 +167,17 @@
     <ClInclude Include="gl.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{e4716fc2-ef38-4c9a-8f42-cb7d79f62ad0}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\glsl\110\sky.fs" />
+    <None Include="..\glsl\110\sky.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

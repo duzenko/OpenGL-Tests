@@ -98,7 +98,12 @@ private:
 
 struct CloudModel : RenderModel {
 
-    CloudModel(float span);
+    CloudModel( float span );
+};
+
+struct SkyModel : RenderModel {
+
+    SkyModel();
 };
 
 struct RenderWorld {

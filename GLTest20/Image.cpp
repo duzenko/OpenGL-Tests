@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 void Image::Bind() {
-    if ( !texHandle ) {
-        glGenTextures( 1, &texHandle );
-        printf( "Load texHandle %d\n", texHandle );
-        glBindTexture( GL_TEXTURE_2D, texHandle );
+    if ( !handle ) {
+        glGenTextures( 1, &handle );
+        printf( "Load texHandle %d\n", handle );
+        glBindTexture( GL_TEXTURE_2D, handle );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
@@ -12,6 +12,79 @@ void Image::Bind() {
         glTexImage2D( GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.data() );
     }
     glEnable( GL_TEXTURE_2D );
-    glBindTexture( GL_TEXTURE_2D, texHandle );
+    glBindTexture( GL_TEXTURE_2D, handle );
     Renderer::PC.textureSwitches++;
+}
+
+void Shader::Bind() {
+    if ( !handle ) {
+        Compile();
+        printf( "Load shader %d\n", handle );
+    }
+    glUseProgram( handle );
+    Renderer::PC.shaderSwitches++;
+}
+
+void glAssert( unsigned int obj, GLenum statusType, void ( APIENTRY* ivFun )( GLuint, GLenum, GLint* ),
+    void ( APIENTRY* infoLogFun )( GLuint, GLsizei, GLsizei*, GLchar* ) ) {
+    GLint statusCode = GL_FALSE;
+    ivFun( obj, statusType, &statusCode );
+    if ( statusCode == GL_TRUE ) {
+        return;
+    }
+
+    GLint length = 0;
+    ivFun( obj, GL_INFO_LOG_LENGTH, &length );
+
+    char* error_log = (char*) alloca( length );
+    infoLogFun( obj, length, &length, &error_log[0] );
+
+    fprintf( stderr, "%s\n", error_log );
+    //free( error_log );
+    exit( 0 );
+}
+
+unsigned int makeShader( const char* code, GLenum shaderType ) {
+    unsigned int shader = glCreateShader( shaderType );
+    glShaderSource( shader, 1, &code, NULL );
+    glCompileShader( shader );
+
+    glAssert( shader, GL_COMPILE_STATUS, glGetShaderiv, glGetShaderInfoLog );
+
+    return shader;
+}
+
+void Shader::Compile() {
+    unsigned int vertexShader = !vertexShaderSource.empty() ? makeShader( vertexShaderSource.c_str(), GL_VERTEX_SHADER ) : 0;
+    unsigned int fragmentShader = !fragmentShaderSource.empty() ? makeShader( fragmentShaderSource.c_str(), GL_FRAGMENT_SHADER ) : 0;
+
+    unsigned int program = glCreateProgram();
+    if ( vertexShader ) { glAttachShader( program, vertexShader ); }
+    if ( fragmentShader ) { glAttachShader( program, fragmentShader ); }
+    glLinkProgram( program );
+
+    glAssert( program, GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog );
+
+    if ( vertexShader ) { glDetachShader( program, vertexShader ); }
+    if ( vertexShader ) { glDeleteShader( vertexShader ); }
+    if ( fragmentShader ) { glDetachShader( program, fragmentShader ); }
+    if ( fragmentShader ) { glDeleteShader( fragmentShader ); }
+
+    handle = program;
+}
+
+void Shader::Load() {
+    {
+        std::ifstream t( fileName + ".vs" );
+        std::string str( ( std::istreambuf_iterator<char>( t ) ),
+            std::istreambuf_iterator<char>() );
+        vertexShaderSource = str.c_str();
+    }
+    {
+        std::ifstream t( fileName + ".fs" );
+        std::string str( ( std::istreambuf_iterator<char>( t ) ),
+            std::istreambuf_iterator<char>() );
+        fragmentShaderSource = str.c_str();
+    }
+    state = AbstractImage::State::Loaded;
 }

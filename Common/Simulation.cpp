@@ -17,7 +17,8 @@ void Simulation::Update( double newTime ) {
 
     auto ha = fmaxf( h, 0 );
     light.color = { ha, ha, ha * ha };
-    auto cloudColor = glm::vec4( 5 * skyColor.z, 5 * skyColor.z, 5 * skyColor.z, 1 );
+   
+    /* auto cloudColor = glm::vec4( 5 * skyColor.z, 5 * skyColor.z, 5 * skyColor.z, 1 );
     for ( auto& s : clouds.surfaces )
         s.color = cloudColor;
 
@@ -28,5 +29,5 @@ void Simulation::Update( double newTime ) {
             v.x = -cloudSpan;
         return v;
     };
-    std::transform( clouds.surfaces[0].vertices.begin(), clouds.surfaces[0].vertices.end(), clouds.surfaces[0].vertices.begin(), UpdateCloud );
+    std::transform( clouds.surfaces[0].vertices.begin(), clouds.surfaces[0].vertices.end(), clouds.surfaces[0].vertices.begin(), UpdateCloud );*/
 }

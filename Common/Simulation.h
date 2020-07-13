@@ -13,14 +13,15 @@ struct Simulation {
     Light light;
     glm::vec3 skyColor = { 0, 0, 0 };
 
-    TerrainModel terrain;
+    //TerrainModel terrain;
     std::vector<CubeModel> blocks;
 
     float cloudSpan = 2e3;
-    CloudModel clouds = { cloudSpan };
+    //CloudModel clouds = { cloudSpan };
+    SkyModel sky;
 
     Simulation() {
-        blocks.resize( 128 );
+        //blocks.resize( 128 );
     }
 
     void Update( double newTime );

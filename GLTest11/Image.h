@@ -1,14 +1,16 @@
 #pragma once
 
 struct Image : AbstractImage {
+    using AbstractImage::AbstractImage;
+
     GLuint texHandle = 0;
     void Bind();
 };
 
 struct Images :AbstractImages {
 protected:
-    Image* GenImage() {
-        return new Image();
+    Image* GenImage( const std::string& fileName ) {
+        return new Image(fileName);
     }
 
     virtual void DisableTexturing() {

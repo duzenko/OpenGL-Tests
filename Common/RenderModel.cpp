@@ -166,3 +166,16 @@ CloudModel::CloudModel( float span ) {
         surface.indices.insert( surface.indices.begin(), tIndices.begin(), tIndices.end() );
     }
 }
+
+SkyModel::SkyModel() {
+    name = "sky";
+    DrawSurface& surface = add();
+    surface.texture = abstractImages->Get( "glsl\\sky" );
+    surface.vertices = {
+        {-1, 0, -1},
+        {-1, 0, 1},
+        {1, 0, -1},
+        {1, 0, 1},
+    };
+    surface.indices = { 0, 2, 1, 1, 2, 3 };
+}

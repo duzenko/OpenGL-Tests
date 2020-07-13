@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{2ec5894f-5b1f-481b-8452-a475d7136bec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLTest20.cpp">
@@ -41,5 +44,16 @@
     <ClInclude Include="gl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\glsl\110\sky.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\glsl\110\sky.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

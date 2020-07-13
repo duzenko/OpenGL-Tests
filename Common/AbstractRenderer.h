@@ -4,6 +4,7 @@ struct PerformanceCounters {
 	int drawCalls;
 	int drawTriangles;
 	int textureSwitches;
+	int shaderSwitches;
 };
 
 struct AbstractRenderer {

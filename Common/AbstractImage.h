@@ -1,15 +1,19 @@
 #pragma once
 
 struct AbstractImage {
-    std::string fileName;
     bool hasAlpha = false;
 
-    AbstractImage() {}
+    AbstractImage( const std::string& fileName ) {
+        this->fileName = fileName;
+    }
     ~AbstractImage() {}
 
     virtual void Bind() = 0;
 
     bool CheckLoaded();
+    const std::string& GetFileName() {
+        return fileName;
+    }
 
 protected:
     enum class State {
@@ -17,23 +21,23 @@ protected:
     };
     State state = State::Empty;
 
+    std::string fileName;
     int width = 0, height = 0;
     std::vector<unsigned char> data;
+
+    virtual void Load();
 private:
     static void LoadImages();
     static std::thread ImageLoader;
-
-    void Load();
 };
 
 struct AbstractImages {
     AbstractImage* Get( const std::string& fileName ) {
         for ( auto image : images ) {
-            if ( image->fileName == fileName )
+            if ( image->GetFileName() == fileName )
                 return image;
         }
-        auto image = GenImage();
-        image->fileName = fileName;
+        auto image = GenImage( fileName );
         images.push_back( image );
         return image;
     }
@@ -54,7 +58,7 @@ struct AbstractImages {
 protected:
     AbstractImage* boundImage;
 
-    virtual AbstractImage* GenImage() = 0;
+    virtual AbstractImage* GenImage( const std::string& fileName ) = 0;
     virtual void DisableTexturing() = 0;
 
 private:

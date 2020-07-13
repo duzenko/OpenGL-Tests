@@ -1,12 +1,14 @@
 #pragma once
 
 #include <filesystem>
+#include <fstream>
 #include <list>
 #include <map>
 #include <memory>
 #include <mutex>         
 #include <set>
 #include <stdexcept>
+#include <streambuf>
 #include <string>
 #include <thread>
 #include <vector>
