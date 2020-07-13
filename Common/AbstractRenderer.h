@@ -13,6 +13,7 @@ protected:
 	void ListSurfaces();
 
 public:
+	static void MouseInput( double xpos, double ypos );
 
 	virtual void Render( Simulation& simulation ) = 0;
 
@@ -21,7 +22,8 @@ public:
 	static bool lighting;
 	static bool shadows;
 	static bool wireframe;
-	static float cameraAngle;
+	static float cameraAngleX;
+	static float cameraAngleY;
 
 	static PerformanceCounters PC;
 };

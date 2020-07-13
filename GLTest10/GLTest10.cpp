@@ -30,9 +30,9 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
     }
     if ( action != GLFW_RELEASE ) {
         if ( key == GLFW_KEY_LEFT )
-            Renderer::cameraAngle -= 1e-2f;
+            Renderer::cameraAngleY -= 1e-2f;
         if ( key == GLFW_KEY_RIGHT )
-            Renderer::cameraAngle += 1e-2f;
+            Renderer::cameraAngleY += 1e-2f;
     }
 }
 

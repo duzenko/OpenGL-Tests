@@ -39,7 +39,7 @@ void Renderer::Render( Simulation& simulation ) {
     view = glm::lookAt( glm::vec3( 99.0f, 33, 233.0f ),
         glm::vec3( 0.0f, 0.0f, 0.0f ),
         glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    view = glm::rotate( view, cameraAngle, glm::vec3( 0, 1, 0 ) );
+    view = glm::rotate( view, cameraAngleY, glm::vec3( 0, 1, 0 ) );
     glLoadMatrixf( glm::value_ptr( view ) );
 
     glPolygonMode( GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL );

@@ -29,10 +29,14 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
     }
     if ( action != GLFW_RELEASE ) {
         if ( key == GLFW_KEY_LEFT )
-            Renderer::cameraAngle -= 1e-2f;
+            Renderer::cameraAngleY -= 1e-2f;
         if ( key == GLFW_KEY_RIGHT )
-            Renderer::cameraAngle += 1e-2f;
+            Renderer::cameraAngleY += 1e-2f;
     }
+}
+
+static void cursor_position_callback( GLFWwindow* window, double xpos, double ypos ) {
+    Renderer::MouseInput( xpos, ypos );
 }
 
 /*void PrintStats() {
@@ -65,6 +69,9 @@ int main() {
     }
 
     glfwSetKeyCallback( window, key_callback );
+    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+    glfwSetCursorPosCallback( window, cursor_position_callback );
+
 
     glfwMakeContextCurrent( window );
     glfwSwapInterval( swapInterval );
