@@ -22,6 +22,10 @@ void Shader::Bind() {
         printf( "Load shader %d\n", handle );
     }
     glUseProgram( handle );
+    auto aspectRatio = glGetUniformLocation( handle, "aspectRatio" );
+    glUniform1f( aspectRatio, Renderer::aspectRatio );
+    auto time = glGetUniformLocation( handle, "time" );
+    glUniform1f( time, Simulation::hackTime );
     Renderer::PC.shaderSwitches++;
 }
 
@@ -74,6 +78,7 @@ void Shader::Compile() {
 }
 
 void Shader::Load() {
+    hasAlpha = true;
     {
         std::ifstream t( fileName + ".vs" );
         std::string str( ( std::istreambuf_iterator<char>( t ) ),

@@ -25,6 +25,7 @@ public:
 	static bool wireframe;
 	static float cameraAngleX;
 	static float cameraAngleY;
+	static float aspectRatio;
 
 	static PerformanceCounters PC;
 };

@@ -10,7 +10,8 @@ Renderer::Renderer() {
     Viewport viewport;
     glGetIntegerv( GL_VIEWPORT, (int*)&viewport );
 
-    auto matProj = glm::infinitePerspective( glm::radians( 45.0f ), (float) viewport.width / viewport.height, 11.f );
+    aspectRatio = (float) viewport.width / viewport.height;
+    auto matProj = glm::infinitePerspective( 2 * atan( 1 / aspectRatio ), aspectRatio, 1.f );
     glMatrixMode( GL_PROJECTION );
     glLoadMatrixf( glm::value_ptr( matProj ) );
     glMatrixMode( GL_MODELVIEW );
@@ -33,8 +34,8 @@ Renderer::~Renderer() {
 
 void Renderer::Render( Simulation& simulation ) {
     glm::mat4 view( 1 );
-    view *= glm::rotate( view, cameraAngleX, glm::vec3( 1, 0, 0 ) );
-    view *= glm::rotate( view, cameraAngleY, glm::vec3( 0, 1, 0 ) );
+    view *= glm::rotate( cameraAngleX, glm::vec3( 1, 0, 0 ) );
+    view *= glm::rotate( cameraAngleY, glm::vec3( 0, 1, 0 ) );
     view *= glm::translate( -glm::vec3( 99.0f, 33, 233.0f ) ),
     glLoadMatrixf( glm::value_ptr( view ) );
 
@@ -44,8 +45,7 @@ void Renderer::Render( Simulation& simulation ) {
     else
         glDisable( GL_CULL_FACE );
 
-    auto &skyColor = simulation.skyColor;
-    glClearColor( skyColor.x, skyColor.y, skyColor.z, 1);
+    glClearColor( 0, 0, 0, 1);
     glDepthMask( GL_TRUE );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 

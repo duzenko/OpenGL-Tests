@@ -71,7 +71,7 @@ struct RenderModel {
 struct TerrainModel: RenderModel {
     TerrainModel() {
         name = "terrain";
-        modelMatrix = glm::scale( glm::vec3( 1e3, 1e3, 1e3 ) );
+        modelMatrix = glm::scale( glm::vec3( 1e6, 1e6, 1e6 ) );
         DrawSurface& surface = add();
         surface.vertices = {
             {-1, 0, -1},
@@ -86,7 +86,7 @@ struct TerrainModel: RenderModel {
             {0, 1, 0},
         };
         surface.indices = { 0, 1, 2, 1, 3, 2 };
-        surface.color = { 0, 0.3f, 0, 0 };
+        surface.color = { 0, 0.7f, 0, 0 };
     }
 };
 

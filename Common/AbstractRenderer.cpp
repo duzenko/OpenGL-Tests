@@ -7,6 +7,7 @@ bool AbstractRenderer::shadows = true;
 bool AbstractRenderer::wireframe = false;
 float AbstractRenderer::cameraAngleX = 0;
 float AbstractRenderer::cameraAngleY = 0;
+float AbstractRenderer::aspectRatio = 1;
 PerformanceCounters AbstractRenderer::PC;
 
 bool compareByAlpha( DrawSurface* a, DrawSurface* b ) {

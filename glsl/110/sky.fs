@@ -2,9 +2,8 @@
 
 varying vec3 var_pos;
 varying vec3 fsun;
-varying vec3 var_pos2;
 
-uniform float time = 0.0;
+uniform float time = 3;
 uniform float cirrus = 0.4;
 uniform float cumulus = 0.8;
 
@@ -40,10 +39,6 @@ float fbm( vec3 p ) {
 }
 
 vec3 getColor() {
-    if ( var_pos.y < 0 ) {
-        return vec3( 0.3 );
-    }
-
     vec3 pos = normalize( var_pos );
 
     vec3 color = vec3( 0, 0, 0 );
@@ -98,5 +93,10 @@ vec3 getColor() {
 }
 
 void main() {
-    gl_FragColor.rgb = getColor();
+ if ( var_pos.y < 0 ) {
+     gl_FragColor =  vec4( 0 );
+     return;
+ }
+   gl_FragColor.rgb = getColor();
+    gl_FragColor.a = 1;
 }

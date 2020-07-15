@@ -64,7 +64,9 @@ RenderModel::~RenderModel() {
 
 CubeModel::CubeModel() {
     name = "cube #XX";
-    modelMatrix = glm::scale( glm::vec3( 1e1 ) ) * glm::translate( glm::vec3( glm::linearRand( -15, 15 ), 1, glm::linearRand( -35, 15 ) ) );
+    modelMatrix = glm::translate( glm::vec3( glm::linearRand( -115, 115 ), 1, glm::linearRand( -115, 115 ) ) );// *glm::scale( glm::vec3( 1e1 ) );
+    auto r = glm::diskRand( 44.f );
+    modelMatrix = glm::scale( glm::vec3( 1e1 ) )*glm::translate( glm::vec3( r.x, 1, r.y ) );
     drawBox();
     auto& surface = surfaces[0];
     if ( randomTextures.empty() )
@@ -172,10 +174,10 @@ SkyModel::SkyModel() {
     DrawSurface& surface = add();
     surface.texture = abstractImages->Get( "glsl\\sky" );
     surface.vertices = {
-        {-1, 0, -1},
-        {-1, 0, 1},
-        {1, 0, -1},
-        {1, 0, 1},
+        {-1, -1, 0},
+        {-1, 1, 0},
+        {1, -1, 0},
+        {1, 1, 0},
     };
     surface.indices = { 0, 2, 1, 1, 2, 3 };
 }
