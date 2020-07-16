@@ -7,6 +7,9 @@ struct Renderer: AbstractRenderer {
     Renderer();
     ~Renderer();
     void Render(Simulation &simulation );
+    
+    virtual void DeformSurface( DrawSurface& surf );
+    void DeformSky( DrawSurface& surf );
 
 private:
     void AmbientPass();

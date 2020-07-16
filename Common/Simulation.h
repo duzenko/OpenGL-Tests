@@ -16,8 +16,6 @@ struct Simulation {
     TerrainModel terrain;
     std::vector<CubeModel> blocks;
 
-    float cloudSpan = 2e3;
-    //CloudModel clouds = { cloudSpan };
     SkyModel sky;
 
     Simulation() {

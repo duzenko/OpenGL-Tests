@@ -164,3 +164,33 @@ void Renderer::LightPass( glm::vec4& lightPosition ) {
     glStencilFunc( GL_ALWAYS, 0, 255 );
     glDisable( GL_LIGHT0 );
 }
+
+void Renderer::DeformSurface( DrawSurface& surf ) {
+    switch ( surf.deform ) {
+    case DrawSurface::Deform::Sky:
+        DeformSky( surf );
+        return;
+    }
+    AbstractRenderer::DeformSurface( surf );
+}
+
+void Renderer::DeformSky( DrawSurface& surf ) {
+    static const float cloudSpan = 2e3;
+    static CloudModel clouds = { cloudSpan };
+    for ( auto& s : clouds.surfaces )
+        drawSurfaces.push_back( &s );
+    glm::vec3 skyColor = { 0, 0, surf.model->info["skyColor"] };
+    float delta = surf.model->info["delta"];
+    auto cloudColor = glm::vec4( 5 * skyColor.z, 5 * skyColor.z, 5 * skyColor.z, 1 );
+    for ( auto& s : clouds.surfaces )
+        s.color = cloudColor;
+
+    float cloudOffset = delta * cloudSpan * 1e-2f;
+    auto UpdateCloud = [cloudOffset, this]( glm::vec3 v ) {
+        v.x += cloudOffset;
+        if ( v.x > cloudSpan )
+            v.x = -cloudSpan;
+        return v;
+    };
+    std::transform( clouds.surfaces[0].vertices.begin(), clouds.surfaces[0].vertices.end(), clouds.surfaces[0].vertices.begin(), UpdateCloud );
+}
