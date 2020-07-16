@@ -22,11 +22,17 @@ void Shader::Bind() {
         printf( "Load shader %d\n", handle );
     }
     glUseProgram( handle );
+    Renderer::PC.shaderSwitches++;
+}
+
+void Shader::UpdateUniforms( UniformsMap& uniforms ) {
+    abstractImages->Bind( this );
+    if ( !handle )
+        return;
     auto aspectRatio = glGetUniformLocation( handle, "aspectRatio" );
     glUniform1f( aspectRatio, Renderer::aspectRatio );
     auto time = glGetUniformLocation( handle, "time" );
-    glUniform1f( time, Simulation::hackTime );
-    Renderer::PC.shaderSwitches++;
+    glUniform1f( time, uniforms["time"] );
 }
 
 void glAssert( unsigned int obj, GLenum statusType, void ( APIENTRY* ivFun )( GLuint, GLenum, GLint* ),

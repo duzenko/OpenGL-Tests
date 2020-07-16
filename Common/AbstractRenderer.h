@@ -12,6 +12,7 @@ struct AbstractRenderer {
 protected:
 	std::vector<DrawSurface*> drawSurfaces;
 	void ListSurfaces();
+	virtual void DeformSurface(DrawSurface &surf);
 
 public:
 	static void MouseInput( double xpos, double ypos );

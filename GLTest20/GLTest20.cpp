@@ -85,7 +85,8 @@ int main() {
         renderer.Render( simulation );
         glfwSwapBuffers( window );
         glfwPollEvents();
-        glfwSetWindowTitle( window, string_format( "%f %f", Renderer::cameraAngleY, Renderer::cameraAngleX ).c_str() );
+        auto s = string_format( "Camera angle: %f/%f. Time: %f.", Renderer::cameraAngleY, Renderer::cameraAngleX, simulation.time );
+        glfwSetWindowTitle( window, s.c_str() );
         //PrintStats();
     }
 

@@ -18,10 +18,17 @@ void AbstractRenderer::ListSurfaces() {
     drawSurfaces.clear();
     for ( auto& model: renderWorld.models ) {
         for ( auto& s : model->surfaces ) {
-            drawSurfaces.push_back( &s );
+            if ( s.deform == DrawSurface::Deform::None )
+                drawSurfaces.push_back( &s );
+            else
+                DeformSurface( s );
         }
     }
     std::sort( drawSurfaces.begin(), drawSurfaces.end(), compareByAlpha );
+}
+
+void AbstractRenderer::DeformSurface( DrawSurface& surf ) {
+    drawSurfaces.push_back( &surf );
 }
 
 void AbstractRenderer::MouseInput( double xpos, double ypos ) {

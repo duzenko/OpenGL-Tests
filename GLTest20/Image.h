@@ -1,5 +1,7 @@
 #pragma once
 
+typedef std::map<const char*, float> UniformsMap;
+
 struct Image : AbstractImage {
     using AbstractImage::AbstractImage;
  
@@ -10,7 +12,7 @@ struct Image : AbstractImage {
 struct Shader : AbstractImage {
     using AbstractImage::AbstractImage;
 
-#if 1
+#if 0
     __declspec( noinline ) Shader( const std::string& fileName ): AbstractImage(fileName) {
         Load();
     }
@@ -18,6 +20,7 @@ struct Shader : AbstractImage {
 
     GLuint handle = 0;
     void Bind();
+    void UpdateUniforms( UniformsMap& uniforms );
 
 protected:
     std::string vertexShaderSource, fragmentShaderSource;
@@ -29,9 +32,9 @@ protected:
 struct Images :AbstractImages {
 protected:
     AbstractImage* GenImage( const std::string& fileName ) {
-        std::string prefix( "glsl\\" );
+        std::string prefix( "..\\glsl\\" );
         if ( !fileName.compare( 0, prefix.size(), prefix ) ) 
-            return new Shader( "..\\glsl\\110\\" + fileName.substr(prefix.size()) );
+            return new Shader( fileName );
         return new Image( fileName );
     }
 

@@ -27,6 +27,4 @@ struct Simulation {
     void Update( double newTime );
 
     static bool paused;
-    static float hackTime;
 };
-

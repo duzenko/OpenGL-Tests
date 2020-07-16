@@ -1,7 +1,6 @@
 #include "pch.h"
 
 bool Simulation::paused = false;
-float Simulation::hackTime = 0;
 
 void Simulation::Update( double newTime ) {
     //newTime = 17.5;
@@ -10,7 +9,8 @@ void Simulation::Update( double newTime ) {
         delta = (float) ( newTime - time );
         time = newTime;
     }
-    hackTime = (float) time * .05f - 0.3;
+    float hackTime = (float) time * .05f - 0.3f;
+    sky.info["time"] = hackTime;
     glm::vec3 lightDir = glm::rotate( glm::vec3( 0, 0, 1 ), -hackTime + 3.1416f, glm::vec3( -2, 1, 0 ) );
     light.position = { lightDir * 1e5f, 1 };
     auto h = lightDir.y;
@@ -20,7 +20,6 @@ void Simulation::Update( double newTime ) {
     auto ha = fmaxf( h, 0 );
     light.color = { ha, ha, ha * ha };
 
-   
     /* auto cloudColor = glm::vec4( 5 * skyColor.z, 5 * skyColor.z, 5 * skyColor.z, 1 );
     for ( auto& s : clouds.surfaces )
         s.color = cloudColor;

@@ -45,6 +45,11 @@ struct DrawSurface {
     glm::vec4 color = { 1, 1, 1, 1 };
     AbstractImage* texture = nullptr;
 
+    enum class Deform {
+        None, Sky
+    };
+    Deform deform = Deform::None;
+
     RenderModel* model = nullptr;
 
     void BuildEdges();
@@ -55,6 +60,7 @@ struct RenderModel {
     glm::mat4 modelMatrix;
     std::vector<DrawSurface> surfaces;
     std::string name = "unnamed";
+    std::map<const char*, float> info;
 
     RenderModel();
     ~RenderModel();

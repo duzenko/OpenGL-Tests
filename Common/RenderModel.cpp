@@ -172,7 +172,7 @@ CloudModel::CloudModel( float span ) {
 SkyModel::SkyModel() {
     name = "sky";
     DrawSurface& surface = add();
-    surface.texture = abstractImages->Get( "glsl\\sky" );
+    surface.deform = DrawSurface::Deform::Sky;
     surface.vertices = {
         {-1, -1, 0},
         {-1, 1, 0},

@@ -167,3 +167,21 @@ void Renderer::LightPass( glm::vec4& lightPosition ) {
     glStencilFunc( GL_ALWAYS, 0, 255 );
     glDisable( GL_LIGHT0 );
 }
+
+void Renderer::DeformSurface( DrawSurface& surf ) {
+    switch ( surf.deform ) {
+    case DrawSurface::Deform::Sky:
+        DeformSky(surf);
+        return;
+    }
+    AbstractRenderer::DeformSurface( surf );
+}
+
+void Renderer::DeformSky( DrawSurface& surf ) {
+    static DrawSurface s = surf;
+    drawSurfaces.push_back( &s );
+    s.texture = abstractImages->Get( "..\\glsl\\110\\sky" );
+    Shader& shader = *(Shader*)s.texture;
+    UniformsMap uniforms = surf.model->info;
+    shader.UpdateUniforms(uniforms);
+}

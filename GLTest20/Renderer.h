@@ -1,11 +1,14 @@
 #pragma once
 
 
-class Renderer : public AbstractRenderer {
-public:
+struct Renderer : public AbstractRenderer {
     Renderer();
     ~Renderer();
     void Render( Simulation& simulation );
+
+protected:
+    virtual void DeformSurface( DrawSurface& surf );
+    void DeformSky( DrawSurface& surf );
 
 private:
     void AmbientPass();
