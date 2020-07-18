@@ -1,60 +1,57 @@
-#include "stdafx.h"
+#include "../GLTest10/stdafx.h"
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
-GLFWwindow* window;
 bool swapInterval = true;
 
-Images images;
-AbstractImages* abstractImages = &images;
-
-void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+void KeyCallback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
     if ( action == GLFW_PRESS ) {
         if ( key == GLFW_KEY_ESCAPE )
             glfwSetWindowShouldClose( window, GLFW_TRUE );
         if ( key == GLFW_KEY_SPACE )
             Simulation::paused = !Simulation::paused;
         if ( key == GLFW_KEY_A )
-            Renderer::ambient = !Renderer::ambient;
+            RendererParams::ambient = !RendererParams::ambient;
         if ( key == GLFW_KEY_C )
-            Renderer::culling = !Renderer::culling;
+            RendererParams::culling = !RendererParams::culling;
         if ( key == GLFW_KEY_L )
-            Renderer::lighting = !Renderer::lighting;
+            RendererParams::lighting = !RendererParams::lighting;
         if ( key == GLFW_KEY_S )
-            Renderer::shadows = !Renderer::shadows;
+            RendererParams::shadows = !RendererParams::shadows;
         if ( key == GLFW_KEY_V )
             glfwSwapInterval( swapInterval = !swapInterval );
         if ( key == GLFW_KEY_W )
-            Renderer::wireframe = !Renderer::wireframe;
+            RendererParams::wireframe = !RendererParams::wireframe;
     }
     if ( action != GLFW_RELEASE ) {
         if ( key == GLFW_KEY_LEFT )
-            Renderer::cameraAngleY -= 1e-2f;
+            RendererParams::cameraAngleY -= 1e-2f;
         if ( key == GLFW_KEY_RIGHT )
-            Renderer::cameraAngleY += 1e-2f;
+            RendererParams::cameraAngleY += 1e-2f;
     }
 }
 
-int main() {
+template<typename T>
+void runTest() {
     if ( !glfwInit() )
-        return 1;
+        return;
 
     glfwWindowHint( GLFW_MAXIMIZED, GLFW_TRUE );
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 1 );
     glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 0 );
-    window = glfwCreateWindow( 1280, 800, "OpenGL 1.0", NULL, NULL );
+    GLFWwindow* window = glfwCreateWindow( 1280, 800, "Loading...", NULL, NULL );
     if ( !window ) {
         glfwTerminate();
-        return 2;
+        return;
     }
 
-    glfwSetKeyCallback( window, key_callback );
+    glfwSetKeyCallback( window, KeyCallback );
 
     glfwMakeContextCurrent( window );
     glfwSwapInterval( swapInterval );
 
-    Renderer renderer;
+    T renderer;
     Simulation simulation;
 
     while ( !glfwWindowShouldClose( window ) ) {
@@ -69,7 +66,28 @@ int main() {
     glfwTerminate();
 }
 
+int main() {
+	runTest<Renderer>();
+}
+
 extern "C" {
     __declspec( dllexport ) int NvOptimusEnablement = 0x00000001;
     //__declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
 }
+
+
+/*void PrintStats() {
+    auto hnd = GetStdHandle( STD_OUTPUT_HANDLE );
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo( hnd, &csbi );
+    auto &pc = Renderer::PC;
+    csbi.dwCursorPosition.Y -= 4;
+    COORD sc = { csbi.srWindow.Right / 2, 0 };
+    SetConsoleCursorPosition( hnd, sc );
+    printf( "\n" );
+    printf( "Draw calls: %d\n", pc.drawCalls );
+    printf( "Draw triangles: %d\n", pc.drawTriangles );
+    printf( "Texture switches: %d\n", pc.textureSwitches );
+    SetConsoleCursorPosition( hnd, csbi.dwCursorPosition );
+    memset( &pc, 0, sizeof( pc ) );
+}*/

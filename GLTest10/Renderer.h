@@ -11,6 +11,8 @@ struct Renderer: AbstractRenderer {
     virtual void DeformSurface( DrawSurface& surf );
     void DeformSky( DrawSurface& surf );
 
+protected:
+
 private:
     void AmbientPass();
     void ShadowPass( glm::vec3& lightPosition );

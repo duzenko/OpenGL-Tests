@@ -85,14 +85,23 @@ struct TerrainModel: RenderModel {
             {1, 0, -1},
             {1, 0, 1},
         };
+        surface.texCoords = {
+            {-1, -1},
+            {-1, 1},
+            {1, -1},
+            {1, 1},
+        };
         surface.normals = {
             {0, 1, 0},
             {0, 1, 0},
             {0, 1, 0},
             {0, 1, 0},
         };
+        for ( auto& tc : surface.texCoords )
+            tc *= 1e4f;
         surface.indices = { 0, 1, 2, 1, 3, 2 };
-        surface.color = { 0, 0.7f, 0, 0 };
+        //surface.color = { 0, 0.7f, 0, 0 };
+        surface.texture = abstractImages->Get( "..\\assets\\grass.jpg" );
     }
 };
 

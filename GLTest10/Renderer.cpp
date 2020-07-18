@@ -29,6 +29,7 @@ Renderer::Renderer() {
     glEnable( GL_LIGHTING );
     glEnable( GL_STENCIL_TEST );
     glClearStencil( 128 );
+    new Images();
 }
 
 Renderer::~Renderer() {
@@ -39,11 +40,11 @@ void Renderer::Render( Simulation& simulation ) {
     view = glm::lookAt( glm::vec3( 99.0f, 33, 233.0f ),
         glm::vec3( 0.0f, 0.0f, 0.0f ),
         glm::vec3( 0.0f, 1.0f, 0.0f ) );
-    view = glm::rotate( view, cameraAngleY, glm::vec3( 0, 1, 0 ) );
+    view = glm::rotate( view, RendererParams::cameraAngleY, glm::vec3( 0, 1, 0 ) );
     glLoadMatrixf( glm::value_ptr( view ) );
 
-    glPolygonMode( GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL );
-    if ( culling )
+    glPolygonMode( GL_FRONT_AND_BACK, RendererParams::wireframe ? GL_LINE : GL_FILL );
+    if ( RendererParams::culling )
         glEnable( GL_CULL_FACE );
     else
         glDisable( GL_CULL_FACE );
@@ -69,7 +70,7 @@ void R_DrawSurface(DrawSurface &surface) {
     glMultMatrixf( glm::value_ptr( surface.model->modelMatrix ) );
     glColor3fv( glm::value_ptr( surface.color ) );
     glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glm::value_ptr( surface.color ) );
-    images.Bind( surface.texture );
+    abstractImages->Bind( surface.texture );
     glBegin( GL_TRIANGLES );
     for ( auto index : surface.indices ) {
         if ( !surface.texCoords.empty() && surface.texture )
@@ -80,8 +81,8 @@ void R_DrawSurface(DrawSurface &surface) {
     }
     glEnd();
     glPopMatrix();
-    Renderer::PC.drawCalls++;
-    Renderer::PC.drawTriangles += surface.indices.size() / 3;
+    RendererParams::PC.drawCalls++;
+    RendererParams::PC.drawTriangles += surface.indices.size() / 3;
 }
 
 void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
@@ -108,12 +109,12 @@ void R_DrawSurfaceShadow( DrawSurface& surface, glm::vec3& lightPosition ) {
         glEnd();
     }
     
-    Renderer::PC.drawCalls++;
-    Renderer::PC.drawTriangles += surface.indices.size() / 3;
+    RendererParams::PC.drawCalls++;
+    RendererParams::PC.drawTriangles += surface.indices.size() / 3;
 }
 
 void Renderer::AmbientPass() {
-    if ( !ambient )
+    if ( !RendererParams::ambient )
         return;
     glm::vec3 color1( 0.2f );
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color1 ) );
@@ -133,7 +134,7 @@ void Renderer::AmbientPass() {
 }
 
 void Renderer::ShadowPass( glm::vec3& lightPosition ) {
-    if ( !shadows )
+    if ( !RendererParams::shadows )
         return;
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
     glCullFace( GL_FRONT );
@@ -151,7 +152,7 @@ void Renderer::ShadowPass( glm::vec3& lightPosition ) {
 }
 
 void Renderer::LightPass( glm::vec4& lightPosition ) {
-    if ( !lighting )
+    if ( !RendererParams::lighting )
         return;
     glBlendFunc( GL_ONE, GL_ONE );
     glEnable( GL_LIGHT0 );

@@ -32,6 +32,10 @@ private:
 };
 
 struct AbstractImages {
+    AbstractImages();
+
+    ~AbstractImages();
+
     AbstractImage* Get( const std::string& fileName ) {
         for ( auto image : images ) {
             if ( image->GetFileName() == fileName )

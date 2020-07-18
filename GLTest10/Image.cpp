@@ -15,5 +15,5 @@ void Image::Bind() {
         glEndList();
     }
     glCallList( displayList );
-    Renderer::PC.textureSwitches++;
+    RendererParams::PC.textureSwitches++;
 }

@@ -73,3 +73,14 @@ bool AbstractImage::CheckLoaded() {
     }
     return state == State::Loaded;
 }
+
+AbstractImages::AbstractImages() {
+    assert( !abstractImages );
+    abstractImages = this;
+}
+
+AbstractImages::~AbstractImages() {
+    abstractImages = nullptr;
+}
+
+AbstractImages* abstractImages;
