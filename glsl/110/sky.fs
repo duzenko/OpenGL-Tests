@@ -1,11 +1,11 @@
-#version 120
+#version 110
 
 varying vec3 var_pos;
 varying vec3 fsun;
 
-uniform float time = 3;
-uniform float cirrus = 0.4;
-uniform float cumulus = 0.8;
+uniform float time;
+const float cirrus = 0.4;
+const float cumulus = 0.8;
 
 const float Br = 0.0025;
 const float Bm = 0.0003;
@@ -30,11 +30,11 @@ float noise( vec3 x ) {
 const mat3 m = mat3( 0.0, 1.60, 1.20, -1.6, 0.72, -0.96, -1.2, -0.96, 1.28 );
 float fbm( vec3 p ) {
     float f = 0.0;
-    f += noise( p ) / 2; p = m * p * 1.1;
-    f += noise( p ) / 4; p = m * p * 1.2;
-    f += noise( p ) / 6; p = m * p * 1.3;
-    f += noise( p ) / 12; p = m * p * 1.4;
-    f += noise( p ) / 24;
+    f += noise( p ) / 2.; p = m * p * 1.1;
+    f += noise( p ) / 4.; p = m * p * 1.2;
+    f += noise( p ) / 6.; p = m * p * 1.3;
+    f += noise( p ) / 12.; p = m * p * 1.4;
+    f += noise( p ) / 24.;
     return f;
 }
 
@@ -78,12 +78,12 @@ vec3 getColor() {
         ;
     
     // Cirrus Clouds
-    float density = smoothstep( 1.0 - cirrus, 1.0, fbm( pos.xyz / pos.y * 2.0 + time * 0.05 ) ) * 0.3;
+    float density = smoothstep( 1.0 - cirrus, 1.0, fbm( pos.xyz / pos.y * 2.0 + time * 1e1 ) ) * 0.3;
     color.rgb = mix(color.rgb, extinction * 4.0, density * max(pos.y, 0.0));
 
     // Cumulus Clouds
     for ( int i = 0; i < 3; i++ ) {
-        float density = smoothstep( 1.0 - cumulus, 1.0, fbm( ( 0.7 + float( i ) * 0.01 ) * pos.xyz / pos.y + time * 0.3 ) );
+        float density = smoothstep( 1.0 - cumulus, 1.0, fbm( ( 0.7 + float( i ) * 0.01 ) * pos.xyz / pos.y + time * 1e1 ) );
         color.rgb = mix(color.rgb, extinction * density * 5.0, min(density, 1.0) * max(pos.y, 0.0));
     }
 
@@ -93,10 +93,10 @@ vec3 getColor() {
 }
 
 void main() {
- if ( var_pos.y < 0 ) {
+ if ( var_pos.y < 0. ) {
      gl_FragColor =  vec4( 0 );
      return;
  }
    gl_FragColor.rgb = getColor();
-    gl_FragColor.a = 1;
+    gl_FragColor.a = 1.;
 }

@@ -8,7 +8,7 @@ struct Light {
 };
 
 struct Simulation {
-    double time = 0;
+    double time = 0.2;
     
     Light light;
     glm::vec3 skyColor = { 0, 0, 0 };
@@ -22,7 +22,7 @@ struct Simulation {
         blocks.resize( 64 );
     }
 
-    void Update( double newTime );
+    void Update( double delta );
 
     static bool paused;
 };

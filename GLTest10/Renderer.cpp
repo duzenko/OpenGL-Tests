@@ -185,7 +185,7 @@ void Renderer::DeformSky( DrawSurface& surf ) {
     for ( auto& s : clouds.surfaces )
         s.color = cloudColor;
 
-    float cloudOffset = delta * cloudSpan * 1e-2f;
+    float cloudOffset = delta * cloudSpan * 1e-0f;
     auto UpdateCloud = [cloudOffset, this]( glm::vec3 v ) {
         v.x += cloudOffset;
         if ( v.x > cloudSpan )

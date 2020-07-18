@@ -3,7 +3,7 @@
 void Image::Bind() {
     if ( !handle ) {
         glGenTextures( 1, &handle );
-        printf( "Load texHandle %d\n", handle );
+        //printf( "Load texHandle %d\n", handle );
         glBindTexture( GL_TEXTURE_2D, handle );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -19,7 +19,6 @@ void Image::Bind() {
 void Shader::Bind() {
     if ( !handle ) {
         Compile();
-        printf( "Load shader %d\n", handle );
     }
     glUseProgram( handle );
     Renderer::PC.shaderSwitches++;
@@ -49,9 +48,9 @@ void glAssert( unsigned int obj, GLenum statusType, void ( APIENTRY* ivFun )( GL
     char* error_log = (char*) alloca( length );
     infoLogFun( obj, length, &length, &error_log[0] );
 
-    fprintf( stderr, "%s\n", error_log );
+    printf( "%s\n", error_log );
     //free( error_log );
-    exit( 0 );
+    //exit( 0 );
 }
 
 unsigned int makeShader( const char* code, GLenum shaderType ) {
@@ -65,10 +64,11 @@ unsigned int makeShader( const char* code, GLenum shaderType ) {
 }
 
 void Shader::Compile() {
+    unsigned int program = glCreateProgram();
+    printf( "Compile shader %d\n", program );
+
     unsigned int vertexShader = !vertexShaderSource.empty() ? makeShader( vertexShaderSource.c_str(), GL_VERTEX_SHADER ) : 0;
     unsigned int fragmentShader = !fragmentShaderSource.empty() ? makeShader( fragmentShaderSource.c_str(), GL_FRAGMENT_SHADER ) : 0;
-
-    unsigned int program = glCreateProgram();
     if ( vertexShader ) { glAttachShader( program, vertexShader ); }
     if ( fragmentShader ) { glAttachShader( program, fragmentShader ); }
     glLinkProgram( program );

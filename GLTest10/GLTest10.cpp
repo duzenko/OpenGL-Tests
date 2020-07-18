@@ -58,8 +58,9 @@ int main() {
     Simulation simulation;
 
     while ( !glfwWindowShouldClose( window ) ) {
-        auto time = glfwGetTime();
-        simulation.Update( time );
+        static auto time = glfwGetTime();
+        simulation.Update( glfwGetTime() - time );
+        time = glfwGetTime();
         renderer.Render( simulation );
         glfwSwapBuffers( window );
         glfwPollEvents();
