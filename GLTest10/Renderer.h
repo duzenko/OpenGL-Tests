@@ -2,19 +2,23 @@
 
 #include "stdafx.h"
 
-struct Renderer: AbstractRenderer {
+namespace GL10 {
 
-    Renderer();
-    ~Renderer();
-    void Render(Simulation &simulation );
-    
-    virtual void DeformSurface( DrawSurface& surf );
-    void DeformSky( DrawSurface& surf );
+    struct Renderer : AbstractRenderer {
 
-protected:
+        Renderer();
+        ~Renderer();
+        void Render( Simulation& simulation );
 
-private:
-    void AmbientPass();
-    void ShadowPass( glm::vec3& lightPosition );
-    void LightPass( glm::vec4& lightPosition );
-};
+        virtual void DeformSurface( DrawSurface& surf );
+        void DeformSky( DrawSurface& surf );
+
+    protected:
+
+    private:
+        void AmbientPass();
+        void ShadowPass( glm::vec3& lightPosition );
+        void LightPass( glm::vec4& lightPosition );
+    };
+
+}

@@ -1,19 +1,23 @@
 #pragma once
 
-struct Image : public AbstractImage {
-    using AbstractImage::AbstractImage;
-   
-    GLuint displayList = 0;
-    void Bind();
-};
+namespace GL10 {
 
-struct Images :AbstractImages {
-protected:
-    Image* GenImage( const std::string& fileName ) {
-        return new Image( fileName );
-    }
+    struct Image : AbstractImage {
+        using AbstractImage::AbstractImage;
 
-    virtual void DisableTexturing() {
-        glDisable( GL_TEXTURE_2D );
-    }
-};
+        GLuint displayList = 0;
+        void Bind();
+    };
+
+    struct Images :AbstractImages {
+    protected:
+        Image* GenImage( const std::string& fileName ) {
+            return new Image( fileName );
+        }
+
+        virtual void DisableTexturing() {
+            glDisable( GL_TEXTURE_2D );
+        }
+    };
+
+}

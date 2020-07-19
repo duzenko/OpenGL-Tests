@@ -1,7 +1,6 @@
 #pragma once
 
-
-class Renderer : public AbstractRenderer {
+struct Renderer : AbstractRenderer {
 public:
     Renderer();
     ~Renderer();

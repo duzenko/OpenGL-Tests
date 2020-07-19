@@ -1,4 +1,9 @@
-#include "../GLTest10/stdafx.h"
+#define GLAD_GL_IMPLEMENTATION
+#include "../GLTest11/gl.h"
+#undef GLAD_GL_IMPLEMENTATION
+
+#include "../GLTest10/Renderer.h"
+#include "../GLTest11/stdafx.h"
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
@@ -67,7 +72,16 @@ void runTest() {
 }
 
 int main() {
-	runTest<Renderer>();
+    switch ( 10 ) {
+    case 10:
+        runTest<GL10::Renderer>();
+        break;
+    case 11:
+        runTest<GL11::Renderer>();
+        break;
+    default:
+        break;
+    }
 }
 
 extern "C" {

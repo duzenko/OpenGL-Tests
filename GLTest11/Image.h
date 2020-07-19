@@ -1,6 +1,6 @@
 #pragma once
 
-struct Image : AbstractImage {
+struct Image: AbstractImage {
     using AbstractImage::AbstractImage;
 
     GLuint texHandle = 0;
