@@ -1,9 +1,10 @@
 #define GLAD_GL_IMPLEMENTATION
-#include "../GLTest11/gl.h"
+#include "../GLTest20/gl.h"
 #undef GLAD_GL_IMPLEMENTATION
 
 #include "../GLTest10/Renderer.h"
-#include "../GLTest11/stdafx.h"
+#include "../GLTest11/Renderer.h"
+#include "../GLTest20/Renderer.h"
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
@@ -72,12 +73,15 @@ void runTest() {
 }
 
 int main() {
-    switch ( 10 ) {
+    switch ( 20 ) {
     case 10:
         runTest<GL10::Renderer>();
         break;
     case 11:
         runTest<GL11::Renderer>();
+        break;
+    case 20:
+        runTest<GL20::Renderer>();
         break;
     default:
         break;

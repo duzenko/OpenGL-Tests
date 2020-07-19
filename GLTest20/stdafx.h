@@ -6,5 +6,3 @@
 
 #include "Image.h"
 #include "Renderer.h"
-
-extern Images images;

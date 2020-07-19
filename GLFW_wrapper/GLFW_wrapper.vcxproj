@@ -146,8 +146,14 @@
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{e4716fc2-ef38-4c9a-8f42-cb7d79f62ad0}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\GLTest10\GLTest10.vcxproj">
+      <Project>{a2680606-c413-40d7-8473-92b86ccabc5d}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\GLTest11\GLTest11.vcxproj">
       <Project>{c5f8eba5-441f-4cb6-ad07-05052588ef5d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\GLTest20\GLTest20.vcxproj">
+      <Project>{e7198c46-a7d4-43ec-b2ff-a06c63130d03}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
