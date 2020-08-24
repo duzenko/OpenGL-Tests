@@ -9,6 +9,7 @@ struct AbstractImage {
     ~AbstractImage() {}
 
     virtual void Bind() = 0;
+    virtual void Unbind() {}
 
     bool CheckLoaded();
     const std::string& GetFileName() {
@@ -52,6 +53,8 @@ struct AbstractImages {
         if ( image && !image->CheckLoaded() )
             image = nullptr;
         if ( image ) {
+            if ( boundImage )
+                boundImage->Unbind();
             image->Bind();
         } else {
             DisableTexturing();

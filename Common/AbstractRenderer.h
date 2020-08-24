@@ -12,6 +12,7 @@ struct RendererParams {
 	static inline bool culling = true;
 	static inline bool lighting = true;
 	static inline bool shadows = true;
+	static inline bool deforms = true;
 	static inline bool wireframe = false;
 	static inline float cameraAngleX = 0;
 	static inline float cameraAngleY = 0;

@@ -21,7 +21,10 @@ namespace GL20 {
 #endif
 
         GLuint handle = 0;
-        void Bind();
+        virtual void Bind();
+        virtual void Unbind() {
+            glUseProgram( 0 );
+        }
         void UpdateUniforms( UniformsMap& uniforms );
 
     protected:

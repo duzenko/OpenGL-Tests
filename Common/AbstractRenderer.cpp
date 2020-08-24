@@ -11,7 +11,10 @@ void AbstractRenderer::ListSurfaces() {
             if ( s.deform == DrawSurface::Deform::None )
                 drawSurfaces.push_back( &s );
             else
-                DeformSurface( s );
+                if ( RendererParams::deforms )
+                    DeformSurface( s );
+                else
+                    ;//
         }
     }
     std::sort( drawSurfaces.begin(), drawSurfaces.end(), compareByAlpha );

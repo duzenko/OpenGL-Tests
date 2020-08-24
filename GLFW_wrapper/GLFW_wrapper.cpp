@@ -21,6 +21,8 @@ void KeyCallback( GLFWwindow* window, int key, int scancode, int action, int mod
             RendererParams::ambient = !RendererParams::ambient;
         if ( key == GLFW_KEY_C )
             RendererParams::culling = !RendererParams::culling;
+        if ( key == GLFW_KEY_D )
+            RendererParams::deforms = !RendererParams::deforms;
         if ( key == GLFW_KEY_L )
             RendererParams::lighting = !RendererParams::lighting;
         if ( key == GLFW_KEY_S )
