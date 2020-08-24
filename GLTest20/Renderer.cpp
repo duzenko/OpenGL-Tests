@@ -177,6 +177,9 @@ namespace GL20 {
         case DrawSurface::Deform::Sky:
             DeformSky( surf );
             return;
+        case DrawSurface::Deform::Grass:
+            DeformGrass( surf );
+            return;
         }
         AbstractRenderer::DeformSurface( surf );
     }
@@ -190,4 +193,14 @@ namespace GL20 {
         shader.UpdateUniforms( uniforms );
     }
 
+    void Renderer::DeformGrass( DrawSurface& surf ) {
+        static DrawSurface s = surf;
+        drawSurfaces.push_back( &s );
+        s.texture = abstractImages->Get( "..\\glsl\\110\\grass" );
+        Shader& shader = *(Shader*) s.texture;
+        UniformsMap uniforms = surf.model->info;
+        shader.UpdateUniforms( uniforms );
+        s.normals.clear();
+        shader.hasAlpha = true;
+    }
 }

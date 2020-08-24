@@ -2,7 +2,7 @@
 
 namespace GL20 {
 
-    typedef std::map<const char*, float> UniformsMap;
+    typedef std::map<const char*, void*> UniformsMap;
 
     struct Image : AbstractImage {
         using AbstractImage::AbstractImage;
@@ -22,9 +22,7 @@ namespace GL20 {
 
         GLuint handle = 0;
         virtual void Bind();
-        virtual void Unbind() {
-            glUseProgram( 0 );
-        }
+        virtual void Unbind();
         void UpdateUniforms( UniformsMap& uniforms );
 
     protected:

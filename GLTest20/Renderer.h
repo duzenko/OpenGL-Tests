@@ -10,6 +10,7 @@ namespace GL20 {
     protected:
         virtual void DeformSurface( DrawSurface& surf );
         void DeformSky( DrawSurface& surf );
+        void DeformGrass( DrawSurface& surf );
 
     private:
         void AmbientPass();

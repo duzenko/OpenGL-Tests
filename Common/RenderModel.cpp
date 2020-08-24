@@ -56,6 +56,7 @@ void DrawSurface::ForEachTriangle( void ( *callback )( glm::vec3* ) ) {
 
 RenderModel::RenderModel() :modelMatrix( 1 ) {
     renderWorld.models.insert( this );
+    info["modelMatrix"] = glm::value_ptr( modelMatrix );
 };
 
 RenderModel::~RenderModel() {
@@ -180,4 +181,39 @@ SkyModel::SkyModel() {
         {1, 1, 0},
     };
     surface.indices = { 0, 2, 1, 1, 2, 3 };
+    info["time"] = &renderTime;
+    info["delta"] = &renderTimeDelta;
+    info["skyColor"] = &skyColor;
+}
+
+TerrainModel::TerrainModel() {
+    name = "terrain";
+    modelMatrix = glm::scale( glm::vec3( 1e6, 1e6, 1e6 ) );
+    DrawSurface& surface = add();
+    surface.vertices = {
+        {-1, 0, -1},
+        {-1, 0, 1},
+        {1, 0, -1},
+        {1, 0, 1},
+    };
+    surface.texCoords = {
+        {-1, -1},
+        {-1, 1},
+        {1, -1},
+        {1, 1},
+    };
+    surface.normals = {
+        {0, 1, 0},
+        {0, 1, 0},
+        {0, 1, 0},
+        {0, 1, 0},
+    };
+    for ( auto& tc : surface.texCoords )
+        tc *= 2e4f;
+    surface.indices = { 0, 1, 2, 1, 3, 2 };
+    //surface.color = { 0, 0.7f, 0, 0 };
+    surface.texture = abstractImages->Get( "..\\assets\\grass.jpg" );
+    auto deform = surface;
+    deform.deform = DrawSurface::Deform::Grass;
+    add() = deform;
 }

@@ -31,6 +31,8 @@ void KeyCallback( GLFWwindow* window, int key, int scancode, int action, int mod
             glfwSwapInterval( swapInterval = !swapInterval );
         if ( key == GLFW_KEY_W )
             RendererParams::wireframe = !RendererParams::wireframe;
+        if ( key == GLFW_KEY_F5 )
+            RendererParams::reloadShaders = !RendererParams::reloadShaders;
     }
     if ( action != GLFW_RELEASE ) {
         if ( key == GLFW_KEY_LEFT )
@@ -67,6 +69,7 @@ void runTest() {
         simulation.Update( glfwGetTime() - time );
         time = glfwGetTime();
         renderer.Render( simulation );
+        RendererParams::reloadShaders = false;
         glfwSwapBuffers( window );
         glfwPollEvents();
     }

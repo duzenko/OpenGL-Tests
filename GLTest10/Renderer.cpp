@@ -182,8 +182,8 @@ namespace GL10 {
         static CloudModel clouds = { cloudSpan };
         for ( auto& s : clouds.surfaces )
             drawSurfaces.push_back( &s );
-        glm::vec3 skyColor = { 0, 0, surf.model->info["skyColor"] };
-        float delta = surf.model->info["delta"];
+        glm::vec3 skyColor = { 0, 0, *(float*) surf.model->info["skyColor"] };
+        float delta = *(float*)surf.model->info["delta"];
         auto cloudColor = glm::vec4( 5 * skyColor.z, 5 * skyColor.z, 5 * skyColor.z, 1 );
         for ( auto& s : clouds.surfaces )
             s.color = cloudColor;

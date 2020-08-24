@@ -14,6 +14,7 @@ struct RendererParams {
 	static inline bool shadows = true;
 	static inline bool deforms = true;
 	static inline bool wireframe = false;
+	static inline bool reloadShaders = false;
 	static inline float cameraAngleX = 0;
 	static inline float cameraAngleY = 0;
 	static inline float aspectRatio = 1;

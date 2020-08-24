@@ -27,14 +27,29 @@ namespace GL20 {
         RendererParams::PC.shaderSwitches++;
     }
 
+    void Shader::Unbind() {
+        glUseProgram( 0 );
+        if ( RendererParams::reloadShaders ) {
+            glDeleteProgram( handle );
+            handle = 0;
+            state = State::Empty;
+        }
+    }
+
     void Shader::UpdateUniforms( UniformsMap& uniforms ) {
         abstractImages->Bind( this );
         if ( !handle )
             return;
         auto aspectRatio = glGetUniformLocation( handle, "aspectRatio" );
         glUniform1f( aspectRatio, RendererParams::aspectRatio );
-        auto time = glGetUniformLocation( handle, "time" );
-        glUniform1f( time, uniforms["time"] );
+        if ( uniforms.count( "time" ) ) {
+            auto time = glGetUniformLocation( handle, "time" );
+            glUniform1fv( time, 1, (const GLfloat*) uniforms["time"] );
+        }
+        if ( uniforms.count( "modelMatrix" ) ) {
+            auto modelMatrix = glGetUniformLocation( handle, "modelMatrix" );
+            glUniformMatrix4fv( modelMatrix, 1, GL_FALSE, (const GLfloat*) uniforms["modelMatrix"] );
+        }
     }
 
     void glAssert( unsigned int obj, GLenum statusType, void ( APIENTRY* ivFun )( GLuint, GLenum, GLint* ),

@@ -46,7 +46,7 @@ struct DrawSurface {
     AbstractImage* texture = nullptr;
 
     enum class Deform {
-        None, Sky
+        None, Sky, Grass
     };
     Deform deform = Deform::None;
 
@@ -60,7 +60,7 @@ struct RenderModel {
     glm::mat4 modelMatrix;
     std::vector<DrawSurface> surfaces;
     std::string name = "unnamed";
-    std::map<const char*, float> info;
+    std::map<const char*, void*> info;
 
     RenderModel();
     ~RenderModel();
@@ -75,34 +75,7 @@ struct RenderModel {
 };
 
 struct TerrainModel: RenderModel {
-    TerrainModel() {
-        name = "terrain";
-        modelMatrix = glm::scale( glm::vec3( 1e6, 1e6, 1e6 ) );
-        DrawSurface& surface = add();
-        surface.vertices = {
-            {-1, 0, -1},
-            {-1, 0, 1},
-            {1, 0, -1},
-            {1, 0, 1},
-        };
-        surface.texCoords = {
-            {-1, -1},
-            {-1, 1},
-            {1, -1},
-            {1, 1},
-        };
-        surface.normals = {
-            {0, 1, 0},
-            {0, 1, 0},
-            {0, 1, 0},
-            {0, 1, 0},
-        };
-        for ( auto& tc : surface.texCoords )
-            tc *= 2e4f;
-        surface.indices = { 0, 1, 2, 1, 3, 2 };
-        //surface.color = { 0, 0.7f, 0, 0 };
-        surface.texture = abstractImages->Get( "..\\assets\\grass.jpg" );
-    }
+    TerrainModel();
 };
 
 struct CubeModel : RenderModel {
@@ -117,6 +90,7 @@ struct CloudModel : RenderModel {
 };
 
 struct SkyModel : RenderModel {
+    float renderTime, renderTimeDelta, skyColor;
 
     SkyModel();
 };
