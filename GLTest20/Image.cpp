@@ -8,7 +8,8 @@ namespace GL20 {
             //printf( "Load texHandle %d\n", handle );
             glBindTexture( GL_TEXTURE_2D, handle );
             glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+            glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
             glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
             auto const format = hasAlpha ? GL_RGBA : GL_RGB;
             glTexImage2D( GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.data() );
