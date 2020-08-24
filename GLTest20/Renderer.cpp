@@ -122,7 +122,7 @@ namespace GL20 {
     void Renderer::AmbientPass() {
         if ( !RendererParams::ambient )
             return;
-        glm::vec3 color1( 0.2f );
+        glm::vec3 color1( 0.3f );
         glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color1 ) );
         auto alphaSurfs = false;
         glBlendFunc( GL_ONE, GL_ZERO );
