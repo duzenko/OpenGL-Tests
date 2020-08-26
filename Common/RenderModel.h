@@ -95,6 +95,10 @@ struct SkyModel : RenderModel {
     SkyModel();
 };
 
+struct VegetationModel : RenderModel {
+    VegetationModel();
+};
+
 struct RenderWorld {
     std::set<RenderModel*> models;
 };

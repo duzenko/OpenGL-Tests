@@ -29,6 +29,7 @@ namespace GL20 {
         glEnableClientState( GL_VERTEX_ARRAY );
         glEnable( GL_STENCIL_TEST );
         glClearStencil( 128 );
+        glAlphaFunc( GL_GREATER, 0.5 );
         new Images();
     }
 
@@ -130,11 +131,13 @@ namespace GL20 {
         for ( auto s : drawSurfaces ) {
             if ( !alphaSurfs && s->texture && s->texture->hasAlpha ) {
                 glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-                glDepthMask( GL_FALSE );
+                glEnable( GL_ALPHA_TEST );
                 alphaSurfs = true;
             }
             R_DrawSurface( *s );
         }
+        glDepthMask( GL_FALSE );
+        glDisable( GL_ALPHA_TEST );
         glm::vec3 color0( 0.0f );
         glLightModelfv( GL_LIGHT_MODEL_AMBIENT, glm::value_ptr( color0 ) );
     }
@@ -165,9 +168,16 @@ namespace GL20 {
         glLightfv( GL_LIGHT0, GL_POSITION, glm::value_ptr( lightPosition ) );
 
         glStencilFunc( GL_EQUAL, 128, 255 );
-        for ( auto s : drawSurfaces )
-            if ( !s->normals.empty() )
-                R_DrawSurface( *s );
+        auto alphaSurfs = false;
+        for ( auto s : drawSurfaces ) {
+            if ( s->normals.empty() )
+                continue;
+            if ( !alphaSurfs && s->texture && s->texture->hasAlpha ) {
+                glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+                alphaSurfs = true;
+            }
+            R_DrawSurface( *s );
+        }
         glStencilFunc( GL_ALWAYS, 0, 255 );
         glDisable( GL_LIGHT0 );
     }

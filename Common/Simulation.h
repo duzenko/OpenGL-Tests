@@ -15,6 +15,7 @@ struct Simulation {
 
     TerrainModel terrain;
     std::vector<CubeModel> blocks;
+    VegetationModel grass;
 
     SkyModel sky;
 

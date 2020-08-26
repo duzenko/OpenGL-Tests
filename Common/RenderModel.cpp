@@ -213,7 +213,30 @@ TerrainModel::TerrainModel() {
     surface.indices = { 0, 1, 2, 1, 3, 2 };
     //surface.color = { 0, 0.7f, 0, 0 };
     surface.texture = abstractImages->Get( "..\\assets\\grass.jpg" );
-    auto deform = surface;
+/*    auto deform = surface;
     deform.deform = DrawSurface::Deform::Grass;
-    add() = deform;
+    add() = deform;*/
+
+}
+
+VegetationModel::VegetationModel() {
+    auto& surf = add();
+    surf.texture = abstractImages->Get( "..\\assets\\grass2.png" );
+    //surf.color = glm::vec4( 0.5f, 0.5f, 0.5f, 1 );
+    for ( int i = 0; i < 1 << 10; i++ ) {
+        auto p2 = glm::diskRand( 222.f );
+        auto p = glm::vec3(p2.x, 0, p2.y );
+        for ( int j = 0; j < 3; j++ ) {
+            surf.indices.push_back( surf.indices.size() );
+            surf.normals.push_back({ 0, 1, 0 } );
+        }
+        auto v2 = glm::circularRand( 11.f );
+        auto v = glm::vec3( v2.x, 0, v2.y );
+        surf.vertices.push_back( p );
+        surf.vertices.push_back( p + v + glm::vec3(0, 11.f, 0) );
+        surf.vertices.push_back( p + v + v );
+        surf.texCoords.push_back( glm::vec2( 0, 0 ) );
+        surf.texCoords.push_back( glm::vec2( 0.5, 1 ) );
+        surf.texCoords.push_back( glm::vec2( 1, 0 ) );
+    }
 }
